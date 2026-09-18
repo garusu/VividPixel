@@ -1,0 +1,44 @@
+* {
+	-webkit-user-drag: none;
+	user-drag: none;
+	user-select: none;
+}
+:root {
+  --bar-bg: #202020;
+  --bar-active: #323232;
+  --bar-text: #e3e3e3;
+  --bar-dark: #181818;
+  --bar-canvas: #3c3c3c;
+  --other: #393939;
+}
+body {
+	margin: 0;
+	line-height: 1.15;
+	font-family: Arial;
+	font-size: 16px;
+	background-color: var(--bar-canvas);
+	overflow: clip;
+}
+label, h2, p {
+  color: var(--bar-text);
+  margin: 16px 0;
+}
+img {
+	width: 100%;
+}
+input[type="text"] {
+  all: unset;
+  background-color: var(--other);
+  color: var(--bar-text);
+  border-radius: 7px;
+  padding: 4px 4px;
+  text-align: center;
+  font-size: inherit;
+  box-sizing: border-box;
+  border: 1px solid var(--bar-dark);
+}
+#app {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
