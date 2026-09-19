@@ -50,6 +50,7 @@ export const menuItems = [
 export const tools = [
   ["Pen", "pen.svg", "P"],
   ["Eraser", "eraser.svg", "E"],
+  ["Eyedropper", "picker.svg", "I"],
   ["Line", "line.svg", "L"],
   ["Drag", "drag.svg", "G"]
 ];

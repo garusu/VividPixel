@@ -103,23 +103,31 @@
   function mouseDown(event) {
     last = getPos(event);
     if (event.button === 0) {
-      if (selectedTool.value == "Pen") {
-        current_color = color.hex;
-        action = "draw";
-        setPixel(last.x, last.y, current_color);
-      } else if (selectedTool.value == "Eraser") {
-        current_color = "#0000";
-        action = "draw";
-        setPixel(last.x, last.y, current_color);
-      } else if (selectedTool.value == "Line") {
-        action = "line";
-      } else if (selectedTool.value == "Drag") {
-        action = "drag";
-        offset = [
-          event.clientX - canvasPos.x,
-          event.clientY - canvasPos.y
-        ];
-      };
+      switch (selectedTool.value) {
+        case "Pen":
+          current_color = color.hex;
+          action = "draw";
+          setPixel(last.x, last.y, current_color);
+          break;
+        case "Eraser":
+          current_color = "#0000";
+          action = "draw";
+          setPixel(last.x, last.y, current_color);
+          break;
+        case "Line":
+          action = "line";
+          break;
+        case "Eyedropper":
+          color.hex = getPixelColor(last.x, last.y) || color.hex;
+          break;
+        case "Drag":
+          action = "drag";
+          offset = [
+            event.clientX - canvasPos.x,
+            event.clientY - canvasPos.y
+          ];
+          break;
+      }
     } else if (event.button === 1) {
         action = "drag";
         offset = [
@@ -161,10 +169,21 @@
 
   function getPos(event) {
     const rect = canvas.value.getBoundingClientRect();
+
     return { 
       x: Math.floor((event.clientX - rect.left) * (canvasWidth.value / rect.width)),
       y: Math.floor((event.clientY - rect.top) * (canvasHeight.value / rect.height))
     };
+  }
+
+  function getPixelColor(x, y) {
+    if (x < 0 || y < 0 || x >= canvasWidth.value || y >= canvasHeight.value) return;
+    for (const l of layers.value) {
+      const pixelColor = l.pixels[y * canvasWidth.value + x];
+
+      if (!transperent.includes(pixelColor)) return pixelColor;
+    }
+    return "#0000";
   }
 
   function render() {
@@ -290,7 +309,6 @@
         windowBlock.value = true;
         break;
       case "Save":
-        console.log(layers.value[currentLayer.value].pixels)
         break;
       case "Import":
         openFile();

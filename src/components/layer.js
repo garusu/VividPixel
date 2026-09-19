@@ -21,7 +21,7 @@ export class Layer {
     if (this.undoHistory.length > 20) this.undoHistory.shift();
   }
   undo() {
-    if (this.history.at(-1) !== undefined) {
+    if (this.history.at(-1)) {
       this.undoHistory.push(this.history.at(-1))
       this.history.at(-1).forEach(item => {
         this.pixels[item[0]] = item[1];
@@ -31,7 +31,7 @@ export class Layer {
     }
   }
   redo() {
-    if (this.undoHistory.at(-1) !== undefined) {
+    if (this.undoHistory.at(-1)) {
       this.history.push(this.undoHistory.at(-1))
       this.undoHistory.at(-1).forEach(item => {
         this.pixels[item[0]] = item[2];
