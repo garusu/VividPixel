@@ -30,9 +30,11 @@
 
   const canvas = ref(null);
   const canvasForExport = ref(null);
+  const previewCanvas = ref(null);
 
   let ctx;
   let exportCtx;
+  let previewCtx;
 
   let prevPix;
 
@@ -59,6 +61,7 @@
   onMounted(() => {
     ctx = canvas.value.getContext('2d');
     exportCtx = canvasForExport.value.getContext('2d');
+    previewCtx = previewCanvas.value.getContext('2d');
     prepareСanvas(false);
   })
 
@@ -66,7 +69,7 @@
     if (x < 0 || y < 0 || x >= canvasWidth.value || y >= canvasHeight.value) return;
     if (prev) {
       prevPix[y * canvasWidth.value + x] = true;
-      render();
+      previewRender();
     } else if (layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] != color) {
       layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] = color;
       softRender(x, y);
@@ -118,6 +121,7 @@
           action = "line";
           break;
         case "Eyedropper":
+          if (last.x < 0 || last.y < 0 || last.x >= canvasWidth.value || last.y >= canvasHeight.value) return;
           color.hex = getPixelColor(last.x, last.y) || color.hex;
           break;
         case "Drag":
@@ -149,9 +153,7 @@
     } else if (action == "drag") {
         canvasPos.x = event.clientX - offset[0];
         canvasPos.y = event.clientY - offset[1];
-    
     } else if (action == "line") {
-        prevPix.fill(null);
         drawLine(last.x, last.y, pos.x, pos.y, "#0000", true);
     };
   }
@@ -159,7 +161,7 @@
   function mouseUp(event) {
     const pos = getPos(event);
     if (action == "line") {
-      prevPix.fill(null);
+      previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
       drawLine(last.x, last.y, pos.x, pos.y, color.hex);
     }
     action = null;
@@ -177,7 +179,6 @@
   }
 
   function getPixelColor(x, y) {
-    if (x < 0 || y < 0 || x >= canvasWidth.value || y >= canvasHeight.value) return;
     for (const l of layers.value) {
       const pixelColor = l.pixels[y * canvasWidth.value + x];
 
@@ -195,7 +196,9 @@
   }
 
   function softRender(x, y) {
-    if (layers.value.every(elem => transperent.includes(elem.pixels[y * canvasWidth.value + x]))) {
+    const pixel = getPixelColor(x, y);
+
+    if (pixel == "#0000") {
       if ((x + y) % 2 === 1) {
         ctx.fillStyle = "#e6e6e6";
         ctx.fillRect(x, y, 1, 1);
@@ -204,16 +207,18 @@
         ctx.fillRect(x, y, 1, 1);
       }
     } else {
-      layers.value.toReversed().forEach((value, index) => {
-        ctx.fillStyle = value.pixels[y * canvasWidth.value + x];
-        ctx.fillRect(x, y, 1, 1);
-      });
-    }
-    
-    if (prevPix[y * canvasWidth.value + x] != null) {
-      ctx.fillStyle = "#0008";
+      ctx.fillStyle = pixel;
       ctx.fillRect(x, y, 1, 1);
     }
+  }
+
+  function previewRender() {
+    previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+    previewCtx.fillStyle = "#0008";
+
+    prevPix.forEach((value, index) => {
+      if (value) previewCtx.fillRect(index % canvasWidth.value, Math.floor(index / canvasWidth.value), 1, 1);
+    })
   }
 
   function drawLine(x0, y0, x1, y1, color, prev=false) {
@@ -221,6 +226,8 @@
     let sx = x0 < x1 ? 1 : -1;
     let sy = y0 < y1 ? 1 : -1;
     let err = dx - dy;
+    if (prev) prevPix.fill(null);
+
     while (true) {
       setPixel(x0, y0, color, prev);
       if (x0 === x1 && y0 === y1) break;
@@ -366,6 +373,19 @@
   >
     <Toolbar />
     <canvas 
+      ref="previewCanvas"
+      id="preview" 
+      :width="canvasWidth" 
+      :height="canvasHeight" 
+      :style="{
+        left: canvasPos.x + 'px', 
+        top: canvasPos.y + 'px', 
+        width: ratio.width + 'px',
+        height: ratio.height + 'px',
+        scale: canvasScale
+      }"
+    ></canvas>
+    <canvas 
       ref="canvas" 
       id="canvas" 
       :width="canvasWidth" 
@@ -392,6 +412,10 @@
     image-rendering: pixelated;
     position: absolute;
     z-index: -1;
+  }
+  #preview {
+    pointer-events: none;
+    z-index: 1;
   }
   #board {
     position: relative;

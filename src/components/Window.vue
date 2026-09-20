@@ -55,7 +55,7 @@
     height: 100%;
     width: 100%;
     background-color: #0008;
-    z-index: 1;
+    z-index: 3;
 
     #block {
       display: flex;
