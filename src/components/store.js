@@ -20,6 +20,7 @@ export const selectedTool = ref("Pen");
 
 export const runFunc = ref(null);
 export const runRender = ref(null);
+export const runErrorMessage = ref(null);
 
 export const windowBlock = ref(true);
 
@@ -29,7 +30,7 @@ export const menuItems = [
     ["Open", "Ctrl + O", true], 
     ["Save", "Ctrl + S", true],
     ["Import", "Ctrl + I"],
-    ["Import as Layer", "", true],
+    ["Import as Layer", ""],
     ["Export", "Ctrl + E"],
     ["Resize", "", true],
     ["Reset", ""]

@@ -3,10 +3,12 @@
   import Sidebar from './components/Sidebar.vue';
   import Board from './components/Board.vue';
   import Window from './components/Window.vue';
+  import Message from './components/Message.vue';
 </script>
 
 <template>
   <Window />
+  <Message />
   <Menubar />
   <div id="block">
     <Board />

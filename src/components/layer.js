@@ -76,5 +76,6 @@ export function removeLayer(index=0) {
 
 export function resetLayers() {
   layers.value = [ new Layer("Layer 1") ];
+  currentLayer.value = 0;
   counter = 2;
 }

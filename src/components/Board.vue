@@ -18,14 +18,16 @@
     canvasWidth, 
     canvasHeight, 
     windowBlock,
-    canvasResizeTrigger
+    canvasResizeTrigger, 
+    runErrorMessage
   } from './store.js';
 
   import { 
     Layer,
     layers,
     currentLayer,
-    resetLayers
+    resetLayers, 
+    addLayer
   } from './layer.js';
 
   const canvas = ref(null);
@@ -67,12 +69,16 @@
 
   function setPixel(x, y, color, prev=false) {
     if (x < 0 || y < 0 || x >= canvasWidth.value || y >= canvasHeight.value) return;
-    if (prev) {
-      prevPix[y * canvasWidth.value + x] = true;
-      previewRender();
-    } else if (layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] != color) {
-      layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] = color;
-      softRender(x, y);
+    if (layers.value.length !== 0) {
+      if (prev) {
+        prevPix[y * canvasWidth.value + x] = true;
+        previewRender();
+      } else if (layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] != color) {
+        layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] = color;
+        softRender(x, y);
+      }
+    } else {
+      runErrorMessage.value = "Layer";
     }
   }
 
@@ -83,16 +89,18 @@
   }
 
   function historyUpdate() {
-    layers.value[currentLayer.value].history.push(
-      layers.value[currentLayer.value].pixels
-        .map((value, index) => 
-          value !== layers.value[currentLayer.value].pixelsBackup[index] 
-            ? [index, layers.value[currentLayer.value].pixelsBackup[index], value] 
-            : -1)
-        .filter(index => index !== -1)
-    );
-    layers.value[currentLayer.value].updateBackup();
-    layers.value[currentLayer.value].undoHistory = [];
+    if (layers.value.length !== 0) {
+      layers.value[currentLayer.value].history.push(
+        layers.value[currentLayer.value].pixels
+          .map((value, index) => 
+            value !== layers.value[currentLayer.value].pixelsBackup[index] 
+              ? [index, layers.value[currentLayer.value].pixelsBackup[index], value] 
+              : -1)
+          .filter(index => index !== -1)
+      );
+      layers.value[currentLayer.value].updateBackup();
+      layers.value[currentLayer.value].undoHistory = [];
+    }
   }
 
   function wheelScroll(event) {
@@ -181,7 +189,6 @@
   function getPixelColor(x, y) {
     for (const l of layers.value) {
       const pixelColor = l.pixels[y * canvasWidth.value + x];
-
       if (!transperent.includes(pixelColor)) return pixelColor;
     }
     return "#0000";
@@ -237,7 +244,7 @@
     }
   }
 
-  async function openFile() {
+  async function openFile(asLayer=false) {
     const [filePicker] = await window.showOpenFilePicker({
       types: [{
         description: 'Image',
@@ -251,35 +258,50 @@
     const img = new Image();
 
     img.onload = async () => {
-      canvasWidth.value = img.width
-      canvasHeight.value = img.height
-      canvasResizeTrigger.value += 1
+      if (img.width < 257 && img.height < 257) {
+        if (!asLayer) {
+          resetLayers();
 
-      await nextTick();
-      await nextTick();
+          canvasWidth.value = img.width;
+          canvasHeight.value = img.height;
+          canvasResizeTrigger.value += 1;
+        } else if (canvasWidth.value == img.width && canvasHeight.value == img.height) {
+          addLayer("Import");
+          currentLayer.value = 0;
+        } else {
+          runErrorMessage.value = "Size";
+          return;
+        }
 
-      const canvasImg = document.createElement("canvas");
-      const ctxImg = canvasImg.getContext("2d");
-      canvasImg.width = img.width;
-      canvasImg.height = img.height;
-      ctxImg.drawImage(img, 0, 0);
-      const rgba = ctxImg.getImageData(
-        0, 0,
-        img.width,
-        img.height
-      ).data;
+        await nextTick();
+        await nextTick();
 
-      let j = 0
+        const canvasImg = document.createElement("canvas");
+        const ctxImg = canvasImg.getContext("2d");
+        canvasImg.width = img.width;
+        canvasImg.height = img.height;
+        ctxImg.drawImage(img, 0, 0);
+        const rgba = ctxImg.getImageData(
+          0, 0,
+          img.width,
+          img.height
+        ).data;
 
-      for (let i = 0; i < rgba.length; i += 4) {
-        layers.value[currentLayer.value].pixels[j] = (
-          "#" +
-          rgba[i].toString(16).padStart(2, "0") +
-          rgba[i + 1].toString(16).padStart(2, "0") +
-          rgba[i + 2].toString(16).padStart(2, "0") +
-          rgba[i + 3].toString(16).padStart(2, "0")
-        );
-        j += 1;
+        let j = 0
+
+        for (let i = 0; i < rgba.length; i += 4) {
+          layers.value[currentLayer.value].pixels[j] = (
+            "#" +
+            rgba[i].toString(16).padStart(2, "0") +
+            rgba[i + 1].toString(16).padStart(2, "0") +
+            rgba[i + 2].toString(16).padStart(2, "0") +
+            (rgba[i + 3].toString(16).padStart(2, "0") == "ff" ? "" : rgba[i + 3].toString(16).padStart(2, "0"))
+          );
+          j += 1;
+        }
+        historyUpdate();
+      } else {
+        runErrorMessage.value = "Import";
       }
       URL.revokeObjectURL(urlImg);
       render();
@@ -319,6 +341,9 @@
         break;
       case "Import":
         openFile();
+        break;
+      case "Import as Layer":
+        openFile(true);
         break;
       case "Export":
         for (let y = 0; y < canvasHeight.value; y++) {

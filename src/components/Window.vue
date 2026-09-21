@@ -4,7 +4,8 @@
     canvasWidth, 
     canvasHeight, 
     canvasResizeTrigger, 
-    windowBlock 
+    windowBlock, 
+    runErrorMessage
   } from './store.js';
 
   const widthInput = ref(null);
@@ -21,6 +22,8 @@
       canvasWidth.value = parseInt(heightInput.value.value);
       canvasResizeTrigger.value += 1
       windowBlock.value = false;
+    } else {
+      runErrorMessage.value = "Create";
     }
   }
 </script>

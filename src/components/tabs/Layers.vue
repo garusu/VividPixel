@@ -51,7 +51,6 @@
     align-items: center;
     width: 100%;
     padding: 5px 0;
-    color: var(--bar-text);
   }
   .title {
     border: none;
