@@ -31,6 +31,8 @@
       case "Size":
         showMessage("Incorrect image size");
         break;
+      case "Open":
+        showMessage("Failed to open file");
     }
     runErrorMessage.value = 0;
   })

@@ -27,8 +27,8 @@ export const windowBlock = ref(true);
 export const menuItems = [
   ["File", 
     ["New", "Shift + N"], 
-    ["Open", "Ctrl + O", true], 
-    ["Save", "Ctrl + S", true],
+    ["Open", "Ctrl + O"], 
+    ["Save", "Ctrl + S"],
     ["Import", "Ctrl + I"],
     ["Import as Layer", ""],
     ["Export", "Ctrl + E"],

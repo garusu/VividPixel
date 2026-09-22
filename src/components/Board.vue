@@ -27,7 +27,8 @@
     layers,
     currentLayer,
     resetLayers, 
-    addLayer
+    addLayer, 
+    getLayers
   } from './layer.js';
 
   const canvas = ref(null);
@@ -244,6 +245,63 @@
     }
   }
 
+  async function saveJson() {
+    const data = {
+      type: "Pixel",
+      version: 1,
+      width: canvasWidth.value,
+      height: canvasHeight.value,
+      content: getLayers()
+    }
+
+    const json = JSON.stringify(data, null, 2);
+
+    const handle = await window.showSaveFilePicker({
+      suggestedName: `text.json`,
+      types: [{
+        description: "JSON file",
+        accept: {
+          "application/json": [".json"]
+        }
+      }]
+    })
+
+    const write = await handle.createWritable();
+
+    await write.write(json);
+    await write.close();
+  }
+
+  async function openJson() {
+    const [filePicker] = await window.showOpenFilePicker({
+      types: [{
+        description: 'JSON file',
+        accept: {
+          'application/json': ['.json']
+        }
+      }]
+    })
+
+    const file = await filePicker.getFile();
+    const data = JSON.parse(await file.text());
+
+    if (data.type == "Pixel" && data.version == 1) {
+      resetLayers(true);
+
+      canvasWidth.value = data.width;
+      canvasHeight.value = data.height;
+
+      await nextTick();
+
+      for (const [key, value] of Object.entries(data.content)) {
+        addLayer(key, value, false);
+      }
+      render();
+    } else {
+      runErrorMessage.value = "Open";
+    }
+  }
+
   async function openFile(asLayer=false) {
     const [filePicker] = await window.showOpenFilePicker({
       types: [{
@@ -264,7 +322,6 @@
 
           canvasWidth.value = img.width;
           canvasHeight.value = img.height;
-          canvasResizeTrigger.value += 1;
         } else if (canvasWidth.value == img.width && canvasHeight.value == img.height) {
           addLayer("Import");
           currentLayer.value = 0;
@@ -273,7 +330,6 @@
           return;
         }
 
-        await nextTick();
         await nextTick();
 
         const canvasImg = document.createElement("canvas");
@@ -338,6 +394,10 @@
         windowBlock.value = true;
         break;
       case "Save":
+        saveJson();
+        break;
+      case "Open":
+        openJson();
         break;
       case "Import":
         openFile();
