@@ -14,6 +14,13 @@ export class Layer {
 
     Layer.instances.push(this);
   }
+  destroy() {
+    const index = Layer.instances.indexOf(this);
+
+    if (index !== -1) {
+      Layer.instances.splice(index, 1);
+    }
+  }
   updateBackup() {
     this.pixelsBackup = [...this.pixels];
     this.history = this.history.filter(item => item != 0)
@@ -71,6 +78,7 @@ export function addLayer(title=`Layer ${counter}`, pixels=false, first=true) {
 }
 
 export function removeLayer(index=0) {
+  layers.value[index].destroy();
   layers.value.splice(index, 1);
   runRender.value = true;
   if (!layers.value[currentLayer.value]) {
