@@ -129,6 +129,9 @@
         case "Line":
           action = "line";
           break;
+        case "Square":
+          action = "square";
+          break;
         case "Eyedropper":
           if (last.x < 0 || last.y < 0 || last.x >= canvasWidth.value || last.y >= canvasHeight.value) return;
           color.hex = getPixelColor(last.x, last.y) || color.hex;
@@ -142,15 +145,15 @@
           break;
       }
     } else if (event.button === 1) {
-        action = "drag";
-        offset = [
-          event.clientX - canvasPos.x,
-          event.clientY - canvasPos.y
-        ];
+      action = "drag";
+      offset = [
+        event.clientX - canvasPos.x,
+        event.clientY - canvasPos.y
+      ];
     } else if (event.button === 2 && selectedTool.value == "Pen") {
-        action = "draw";
-        current_color = color2;
-        setPixel(last.x, last.y, current_color);
+      action = "draw";
+      current_color = color2;
+      setPixel(last.x, last.y, current_color);
     }
   }
 
@@ -160,19 +163,26 @@
       drawLine(last.x, last.y, pos.x, pos.y, current_color)
       last = pos;
     } else if (action == "drag") {
-        canvasPos.x = event.clientX - offset[0];
-        canvasPos.y = event.clientY - offset[1];
+      canvasPos.x = event.clientX - offset[0];
+      canvasPos.y = event.clientY - offset[1];
     } else if (action == "line") {
-        drawLine(last.x, last.y, pos.x, pos.y, "#0000", true);
-    };
+      drawLine(last.x, last.y, pos.x, pos.y, "#0000", true);
+    } else if (action == "square") {
+      drawSquare(last.x, last.y, pos.x, pos.y, "#0000", true)
+    }
   }
 
   function mouseUp(event) {
     const pos = getPos(event);
+
     if (action == "line") {
       previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
       drawLine(last.x, last.y, pos.x, pos.y, color.hex);
+    } else if (action == "square") {
+      previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+      drawSquare(last.x, last.y, pos.x, pos.y, color.hex);
     }
+
     action = null;
 
     historyUpdate();
@@ -242,6 +252,20 @@
       let e2 = 2 * err;
       if (e2 > -dy) { err -= dy; x0 += sx; }
       if (e2 < dx) { err += dx; y0 += sy; }
+    }
+  }
+
+  function drawSquare(x0, y0, x1, y1, color, prev=false) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    if (prev) prevPix.fill(null);
+
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        setPixel(x, y, color, prev);
+      }
     }
   }
 

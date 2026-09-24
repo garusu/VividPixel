@@ -53,6 +53,7 @@ export const tools = [
   ["Eraser", "eraser.svg", "E"],
   ["Eyedropper", "picker.svg", "I"],
   ["Line", "line.svg", "L"],
+  ["Square", "square.svg", "S"],
   ["Drag", "drag.svg", "G"]
 ];
 
