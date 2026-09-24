@@ -40,6 +40,7 @@
   let previewCtx;
 
   let prevPix;
+  const filledPrevPix = new Set();
 
   const canvasPos = reactive({
     x: 400,
@@ -48,10 +49,10 @@
 
   let offset = [0, 0];
 
-  let canvasScale = ref(1);
+  const canvasScale = ref(1);
 
   const minCanvasScale = 0.2;
-  const maxCanvasScale = 1.5;
+  const maxCanvasScale = 2;
 
   let action = null;
   let last = null;
@@ -72,15 +73,28 @@
     if (x < 0 || y < 0 || x >= canvasWidth.value || y >= canvasHeight.value) return;
     if (layers.value.length !== 0) {
       if (prev) {
-        prevPix[y * canvasWidth.value + x] = true;
-        previewRender();
+        const index = y * canvasWidth.value + x;
+
+        filledPrevPix.add(index);
+        prevPix[index] = true;
+
+        previewRender(x, y);
       } else if (layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] != color) {
         layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] = color;
+
         softRender(x, y);
       }
     } else {
       runErrorMessage.value = "Layer";
     }
+  }
+
+  function clearPrev() {
+    for (const value of filledPrevPix) {
+      prevPix[value] = null;
+      previewRender(value % canvasWidth.value, Math.floor(value / canvasWidth.value));
+    }
+    filledPrevPix.clear();
   }
 
   function prepareСanvas() {
@@ -168,7 +182,7 @@
     } else if (action == "line") {
       drawLine(last.x, last.y, pos.x, pos.y, "#0000", true);
     } else if (action == "square") {
-      drawSquare(last.x, last.y, pos.x, pos.y, "#0000", true)
+      drawSquare(last.x, last.y, pos.x, pos.y, "#0000", true);
     }
   }
 
@@ -176,11 +190,11 @@
     const pos = getPos(event);
 
     if (action == "line") {
-      previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+      clearPrev();
       drawLine(last.x, last.y, pos.x, pos.y, color.hex);
     } else if (action == "square") {
-      previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
       drawSquare(last.x, last.y, pos.x, pos.y, color.hex);
+      clearPrev();
     }
 
     action = null;
@@ -230,13 +244,13 @@
     }
   }
 
-  function previewRender() {
-    previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
-    previewCtx.fillStyle = "#0008";
-
-    prevPix.forEach((value, index) => {
-      if (value) previewCtx.fillRect(index % canvasWidth.value, Math.floor(index / canvasWidth.value), 1, 1);
-    })
+  function previewRender(x, y) {
+    if (prevPix[y * canvasWidth.value + x] === null) {
+      previewCtx.clearRect(x, y, 1, 1);
+    } else {
+      previewCtx.fillStyle = color.hex;
+      previewCtx.fillRect(x, y, 1, 1);
+    }
   }
 
   function drawLine(x0, y0, x1, y1, color, prev=false) {
@@ -244,7 +258,7 @@
     let sx = x0 < x1 ? 1 : -1;
     let sy = y0 < y1 ? 1 : -1;
     let err = dx - dy;
-    if (prev) prevPix.fill(null);
+    if (prev) clearPrev();
 
     while (true) {
       setPixel(x0, y0, color, prev);
@@ -260,7 +274,7 @@
     const maxX = Math.max(x0, x1);
     const minY = Math.min(y0, y1);
     const maxY = Math.max(y0, y1);
-    if (prev) prevPix.fill(null);
+    if (prev) clearPrev();
 
     for (let y = minY; y <= maxY; y++) {
       for (let x = minX; x <= maxX; x++) {
