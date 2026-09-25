@@ -6,13 +6,13 @@
   <div id="toolbar">
     <button 
       v-for="tool in tools" 
-      :key="tool[0]" 
+      :key="tool.name" 
       class="tool" 
-      :class="{ active: selectedTool == tool[0]}" 
-      :title="`${ tool[0] } ${ tool[2] ? `( ${ tool[2] } )` : '' }`" 
-      @click="selectedTool = tool[0]"
+      :class="{ active: selectedTool == tool.name}" 
+      :title="`${ tool.name } ${ tool.hotkey ? `( ${ tool.hotkey } )` : '' }`" 
+      @click="selectedTool = tool.name"
     >
-      <img :src="getImg(tool[1])">
+      <img :src="getImg(tool.logo)">
     </button>
   </div>
 </template>

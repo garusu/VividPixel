@@ -26,8 +26,8 @@ export const windowBlock = ref(true);
 
 export const menuItems = [
   ["File", 
-    ["New", "Shift + N"], 
-    ["Open", "Ctrl + O"], 
+    ["New", "Shift + N"],
+    ["Open", "Ctrl + O"],
     ["Save", "Ctrl + S"],
     ["Import", "Ctrl + I"],
     ["Import as Layer", ""],
@@ -48,13 +48,28 @@ export const menuItems = [
   ]
 ];
 
+class Tool {
+  constructor(name, logo, hotkey, disable=false) {
+    this.name = name;
+    this.logo = logo;
+    this.hotkey = hotkey;
+    this.disable = disable;
+    this.flags = {};
+  }
+  setFlags(key, value) {
+    console.log(key, value);
+    this.flags[key] = value;
+    return this;
+  }
+}
+
 export const tools = [
-  ["Pen", "pen.svg", "P"],
-  ["Eraser", "eraser.svg", "E"],
-  ["Eyedropper", "picker.svg", "I"],
-  ["Line", "line.svg", "L"],
-  ["Square", "square.svg", "S"],
-  ["Drag", "drag.svg", "G"]
+  (new Tool("Pen", "pen.svg", "P")),
+  (new Tool("Eraser", "eraser.svg", "E")),
+  (new Tool("Eyedropper", "picker.svg", "I")),
+  (new Tool("Line", "line.svg", "L")),
+  (new Tool("Square", "square.svg", "S")),
+  (new Tool("Drag", "drag.svg", "G"))
 ];
 
 function handleKeyDown(event) {
@@ -72,7 +87,7 @@ function handleKeyDown(event) {
 
   console.log(key)
 
-  let func = tools.find(item => item[2] == key)?.[0];
+  let func = tools.find(obj => obj.hotkey == key)?.name;
   
   if (func) selectedTool.value = func;
   else {
