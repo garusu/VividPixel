@@ -11,6 +11,7 @@
   } from 'vue';
 
   import { 
+    tools,
     selectedTool, 
     runFunc, 
     runRender, 
@@ -130,27 +131,27 @@
     last = getPos(event);
     if (event.button === 0) {
       switch (selectedTool.value) {
-        case "Pen":
+        case 0: // Pen
           current_color = color.hex;
           action = "draw";
           setPixel(last.x, last.y, current_color);
           break;
-        case "Eraser":
+        case 1: // Eraser
           current_color = "#0000";
           action = "draw";
           setPixel(last.x, last.y, current_color);
           break;
-        case "Line":
+        case 3: // Line
           action = "line";
           break;
-        case "Square":
+        case 4: // Square
           action = "square";
           break;
-        case "Eyedropper":
+        case 2: // Eyedropper
           if (last.x < 0 || last.y < 0 || last.x >= canvasWidth.value || last.y >= canvasHeight.value) return;
           color.hex = getPixelColor(last.x, last.y) || color.hex;
           break;
-        case "Drag":
+        case 5: // Drag
           action = "drag";
           offset = [
             event.clientX - canvasPos.x,
@@ -164,7 +165,7 @@
         event.clientX - canvasPos.x,
         event.clientY - canvasPos.y
       ];
-    } else if (event.button === 2 && selectedTool.value == "Pen") {
+    } else if (event.button === 2 && selectedTool.value === 0) {
       action = "draw";
       current_color = color2;
       setPixel(last.x, last.y, current_color);
@@ -274,11 +275,13 @@
     const maxX = Math.max(x0, x1);
     const minY = Math.min(y0, y1);
     const maxY = Math.max(y0, y1);
+    const fill = tools[selectedTool.value].flags["Fill"];
     if (prev) clearPrev();
 
     for (let y = minY; y <= maxY; y++) {
       for (let x = minX; x <= maxX; x++) {
-        setPixel(x, y, color, prev);
+        if (fill) setPixel(x, y, color, prev);
+        else if (x == minX || x == maxX || y == minY || y == maxY) setPixel(x, y, color, prev);
       }
     }
   }

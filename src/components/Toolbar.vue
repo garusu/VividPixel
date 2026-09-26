@@ -5,12 +5,12 @@
 <template>
   <div id="toolbar">
     <button 
-      v-for="tool in tools" 
+      v-for="(tool, index) in tools" 
       :key="tool.name" 
       class="tool" 
-      :class="{ active: selectedTool == tool.name}" 
+      :class="{ active: selectedTool == index}" 
       :title="`${ tool.name } ${ tool.hotkey ? `( ${ tool.hotkey } )` : '' }`" 
-      @click="selectedTool = tool.name"
+      @click="selectedTool = index"
     >
       <img :src="getImg(tool.logo)">
     </button>

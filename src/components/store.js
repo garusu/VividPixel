@@ -16,7 +16,7 @@ export const canvasWidth = ref(16);
 export const canvasHeight = ref(16);
 export const canvasResizeTrigger = ref(0)
 
-export const selectedTool = ref("Pen");
+export const selectedTool = ref(0);
 
 export const runFunc = ref(null);
 export const runRender = ref(null);
@@ -56,8 +56,7 @@ class Tool {
     this.disable = disable;
     this.flags = {};
   }
-  setFlags(key, value) {
-    console.log(key, value);
+  setFlags(key, value) { 
     this.flags[key] = value;
     return this;
   }
@@ -68,7 +67,8 @@ export const tools = [
   (new Tool("Eraser", "eraser.svg", "E")),
   (new Tool("Eyedropper", "picker.svg", "I")),
   (new Tool("Line", "line.svg", "L")),
-  (new Tool("Square", "square.svg", "S")),
+  (new Tool("Square", "square.svg", "S"))
+    .setFlags("Fill", true),
   (new Tool("Drag", "drag.svg", "G"))
 ];
 
@@ -87,9 +87,9 @@ function handleKeyDown(event) {
 
   console.log(key)
 
-  let func = tools.find(obj => obj.hotkey == key)?.name;
+  let func = tools.find(obj => obj.hotkey == key);
   
-  if (func) selectedTool.value = func;
+  if (func) selectedTool.value = tools.indexOf(func);
   else {
     func = menuItems.find(level1 => level1.some(level2 => level2.includes(key)))?.find(level2 => level2.includes(key));
     if (func) runFunc.value = func[0];

@@ -2,6 +2,7 @@
   import { shallowRef } from 'vue';
 
   import Sideblock from './Sideblock.vue';
+
   import ColorPicker from './tabs/ColorPicker.vue';
   import Layers from './tabs/Layers.vue';
   import Tool from './tabs/Tool.vue';
