@@ -146,7 +146,7 @@ class Color {
       }
     })
     this.squareX = ref(0);
-    this.squareY = ref(230);
+    this.squareY = ref(275);
     this.hueX = ref(0);
 
     this.hue = ref(null);

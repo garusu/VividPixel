@@ -17,10 +17,9 @@
     aspect-ratio: 1 / 1;
     padding: 2px;
     box-sizing: border-box;
-    background-color: var(--bar-bg);
 
     &:hover {
-      background-color: transparent;
+      background-color: var(--bar-bg);
     }
     img {
       display: block;

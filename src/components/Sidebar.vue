@@ -1,45 +1,32 @@
 <script setup>
-  import Tab from './tabs/Tab.vue';
+  import { shallowRef } from 'vue';
+
+  import Sideblock from './Sideblock.vue';
   import ColorPicker from './tabs/ColorPicker.vue';
   import Layers from './tabs/Layers.vue';
+  import Tool from './tabs/Tool.vue';
+
+  const tab1 = shallowRef([
+    ["layers.svg", Layers],
+    ["pen.svg", Tool]
+  ]);
+  const tab2 = shallowRef([
+    ["color.svg", ColorPicker]
+  ]);
 </script>
 
 <template>
   <div id="sidebar">
-    <div class="tabs">
-      <Tab icon="layers.svg"></Tab>
-    </div>
-    <div class="block">
-      <Layers />
-    </div>
-
-    <div class="tabs">
-      <Tab icon="color.svg"></Tab>
-    </div>
-    <div class="block">
-      <ColorPicker />
-    </div>
-
+    <Sideblock :tab="tab1"></Sideblock>
+    <Sideblock :tab="tab2"></Sideblock>
   </div>
 </template>
 
 <style scoped>
   #sidebar {
     display: flex;
-    width: 300px;
+    width: 350px;
     flex-wrap: wrap;
     height: 100%;
-  }
-  .block {
-    width: 90%;
-    height: 50%;
-    padding: 10px 20px;
-    box-sizing: border-box;
-    background-color: var(--bar-bg);
-  }
-  .tabs {
-    width: 10%;
-    height: 50%;
-    background-color: var(--bar-dark);
   }
 </style>
