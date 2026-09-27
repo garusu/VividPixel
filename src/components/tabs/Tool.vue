@@ -23,6 +23,7 @@
     border: 1px solid white;
     border-radius: 3px;
     margin: 0;
+    margin-bottom: 10px;
     display: inline-grid;
     place-content: center;
 

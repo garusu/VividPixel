@@ -67,13 +67,14 @@ export const tools = [
   (new Tool("Eraser", "eraser.svg", "E")),
   (new Tool("Eyedropper", "picker.svg", "I")),
   (new Tool("Line", "line.svg", "L")),
-  (new Tool("Square", "square.svg", "S"))
-    .setFlags("Fill", true),
+  (new Tool("Rectangle", "square.svg", "R"))
+    .setFlags("Fill", true)
+    .setFlags("Square", false),
   (new Tool("Drag", "drag.svg", "G"))
 ];
 
 function handleKeyDown(event) {
-  if (event.target.tagName === "INPUT") return;
+  if (event.target.tagName === "INPUT" && !['checkbox', 'button'].includes(event.target.type)) return;
   if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
     event.preventDefault()
   }

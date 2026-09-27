@@ -144,7 +144,7 @@
         case 3: // Line
           action = "line";
           break;
-        case 4: // Square
+        case 4: // Rectangle
           action = "square";
           break;
         case 2: // Eyedropper
@@ -271,17 +271,33 @@
   }
 
   function drawSquare(x0, y0, x1, y1, color, prev=false) {
-    const minX = Math.min(x0, x1);
-    const maxX = Math.max(x0, x1);
-    const minY = Math.min(y0, y1);
-    const maxY = Math.max(y0, y1);
     const fill = tools[selectedTool.value].flags["Fill"];
-    if (prev) clearPrev();
+    const square = tools[selectedTool.value].flags["Square"];
 
-    for (let y = minY; y <= maxY; y++) {
-      for (let x = minX; x <= maxX; x++) {
+    let startX;
+    let startY;
+    let endX;
+    let endY;
+
+    if (prev) clearPrev();
+    if (square) {
+      const side = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+    
+      startX = Math.min(x0, x0 + side * ((x1 - x0) >= 0 ? 1 : -1));
+      startY = Math.min(y0, y0 + side * ((y1 - y0) >= 0 ? 1 : -1));
+      endX = startX + side;
+      endY = startY + side;
+    } else {
+      startX = Math.min(x0, x1);
+      startY = Math.min(y0, y1);
+      endX = Math.max(x0, x1);
+      endY = Math.max(y0, y1);
+    }
+
+    for (let y = startY; y <= endY; y++) {
+      for (let x = startX; x <= endX; x++) {
         if (fill) setPixel(x, y, color, prev);
-        else if (x == minX || x == maxX || y == minY || y == maxY) setPixel(x, y, color, prev);
+        else if (x == startX || x == endX || y == startY || y == endY) setPixel(x, y, color, prev);
       }
     }
   }

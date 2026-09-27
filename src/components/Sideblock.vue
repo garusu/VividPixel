@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, shallowRef, defineProps } from 'vue';
+  import { ref, shallowRef } from 'vue';
   import Tab from './tabs/Tab.vue';
 
   const { tab } = defineProps(["tab"]);
