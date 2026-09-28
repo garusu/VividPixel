@@ -14,12 +14,13 @@ export function getImg(name) {
 
 export const canvasWidth = ref(16);
 export const canvasHeight = ref(16);
+
 export const canvasResizeTrigger = ref(0)
+export const renderTrigger = ref(0);
 
 export const selectedTool = ref(0);
 
 export const runFunc = ref(null);
-export const runRender = ref(null);
 export const runErrorMessage = ref(null);
 
 export const windowBlock = ref(true);

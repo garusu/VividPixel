@@ -14,7 +14,7 @@
     tools,
     selectedTool, 
     runFunc, 
-    runRender, 
+    renderTrigger, 
     color, 
     canvasWidth, 
     canvasHeight, 
@@ -456,11 +456,8 @@
     prepareСanvas();
   })
 
-  watch(runRender, (value) => {
-    if (runRender) {
-      render();
-      runRender.value = false;
-    }
+  watch(renderTrigger, (value) => {
+    render();
   })
 
   watch(runFunc, (value) => {
