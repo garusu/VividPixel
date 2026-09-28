@@ -255,18 +255,36 @@
   }
 
   function drawLine(x0, y0, x1, y1, color, prev=false) {
-    let dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
-    let sx = x0 < x1 ? 1 : -1;
-    let sy = y0 < y1 ? 1 : -1;
-    let err = dx - dy;
-    if (prev) clearPrev();
+    const perfect = tools[selectedTool.value].flags["Perpendicular"];
 
-    while (true) {
-      setPixel(x0, y0, color, prev);
-      if (x0 === x1 && y0 === y1) break;
-      let e2 = 2 * err;
-      if (e2 > -dy) { err -= dy; x0 += sx; }
-      if (e2 < dx) { err += dx; y0 += sy; }
+    const dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
+
+    if (prev) clearPrev();
+    if (perfect) {
+      const startX = Math.min(x0, x0 + dx * ((x1 - x0) >= 0 ? 1 : -1));
+      const startY = Math.min(y0, y0 + dy * ((y1 - y0) >= 0 ? 1 : -1));
+
+      if (dx >= dy) {
+        for (let x = startX; x <= startX+dx; x++) {
+          setPixel(x, y0, color, prev);
+        }
+      } else {
+        for (let y = startY; y <= startY+dy; y++) {
+          setPixel(x0, y, color, prev);
+        }
+      }
+    } else {
+      let sx = x0 < x1 ? 1 : -1;
+      let sy = y0 < y1 ? 1 : -1;
+      let err = dx - dy;
+      
+      while (true) {
+        setPixel(x0, y0, color, prev);
+        if (x0 === x1 && y0 === y1) break;
+        let e2 = 2 * err;
+        if (e2 > -dy) { err -= dy; x0 += sx; }
+        if (e2 < dx) { err += dx; y0 += sy; }
+      }
     }
   }
 

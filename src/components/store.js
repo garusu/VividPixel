@@ -66,7 +66,8 @@ export const tools = [
   (new Tool("Pen", "pen.svg", "P")),
   (new Tool("Eraser", "eraser.svg", "E")),
   (new Tool("Eyedropper", "picker.svg", "I")),
-  (new Tool("Line", "line.svg", "L")),
+  (new Tool("Line", "line.svg", "L"))
+    .setFlags("Perpendicular", false),
   (new Tool("Rectangle", "square.svg", "R"))
     .setFlags("Fill", true)
     .setFlags("Square", false),
