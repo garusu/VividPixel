@@ -1,5 +1,5 @@
 <script setup>
-  import { layers, currentLayer, addLayer, removeLayer } from '../layer.js';
+  import { layers, currentLayer, addLayer, removeLayer, moveLayer } from '../layer.js';
 </script>
 
 <template>
@@ -11,7 +11,7 @@
     </div>
     <div 
       v-for="(value, index) in layers"
-      :key="index"
+      :key="value.id"
       class="layer"
     >
       <button 
@@ -22,6 +22,12 @@
         {{ value.title }}
       </button>
       <div class="right">
+        <button class="btn" @click="moveLayer(-1, index)">
+          <img src="../../assets/tools/layer_up.svg">
+        </button>
+        <button class="btn" @click="moveLayer(1, index)">
+          <img src="../../assets/tools/layer_down.svg">
+        </button>
         <button class="btn" @click="removeLayer(index)">
           <img src="../../assets/tools/layer_delete.svg">
         </button>

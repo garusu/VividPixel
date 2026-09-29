@@ -3,8 +3,10 @@ import { canvasWidth, canvasHeight, renderTrigger } from './store.js';
 
 export class Layer {
   static instances = [];
+  static counter = 0;
 
   constructor(title, pix=false) {
+    this.id = Layer.counter;
     this.title = title;
     this.hide = false;
     this.pixels = pix ? pix : Array(canvasWidth.value * canvasHeight.value).fill("#0000");
@@ -13,6 +15,7 @@ export class Layer {
     this.undoHistory = [];
 
     Layer.instances.push(this);
+    Layer.counter += 1;
   }
   destroy() {
     const index = Layer.instances.indexOf(this);
@@ -84,6 +87,13 @@ export function removeLayer(index=0) {
   renderTrigger.value += 1;
   if (!layers.value[currentLayer.value]) {
     currentLayer.value = 0;
+  }
+}
+
+export function moveLayer(direct=1, index) {
+  if (index >= 0 && index <= layers.value.length - 1 && layers.value[index + (1 * direct)]) {
+    [layers.value[index], layers.value[index + (1 * direct)]] = [layers.value[index + (1 * direct)], layers.value[index]];
+    renderTrigger.value += 1;
   }
 }
 
