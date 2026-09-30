@@ -8,7 +8,7 @@ export class Layer {
   constructor(title, pix=false) {
     this.id = Layer.counter;
     this.title = title;
-    this.hide = false;
+    this.visible = true;
     this.pixels = pix ? pix : Array(canvasWidth.value * canvasHeight.value).fill("#0000");
     this.pixelsBackup =  [...this.pixels];
     this.history = [];
@@ -95,6 +95,11 @@ export function moveLayer(direct=1, index) {
     [layers.value[index], layers.value[index + (1 * direct)]] = [layers.value[index + (1 * direct)], layers.value[index]];
     renderTrigger.value += 1;
   }
+}
+
+export function hideLayer(index) {
+  layers.value[index].visible = !layers.value[index].visible;
+  renderTrigger.value += 1;
 }
 
 export function getLayers() {

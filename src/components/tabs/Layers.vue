@@ -1,5 +1,6 @@
 <script setup>
-  import { layers, currentLayer, addLayer, removeLayer, moveLayer } from '../layer.js';
+  import { layers, currentLayer, addLayer, removeLayer, moveLayer, hideLayer } from '../layer.js';
+  import { getImg } from '../store.js';
 </script>
 
 <template>
@@ -7,6 +8,9 @@
     <div id="panel">
       <button class="btn" style="margin: 0;" @click="addLayer()">
         <img src="@/assets/tools/layer_add.svg">
+      </button>
+      <button class="btn" style="margin: 0;" @click="removeLayer(currentLayer)">
+        <img src="@/assets/tools/layer_delete.svg">
       </button>
     </div>
     <div 
@@ -23,13 +27,13 @@
       </button>
       <div class="right">
         <button class="btn" @click="moveLayer(-1, index)">
-          <img src="../../assets/tools/layer_up.svg">
+          <img src="@/assets/tools/layer_up.svg">
         </button>
         <button class="btn" @click="moveLayer(1, index)">
-          <img src="../../assets/tools/layer_down.svg">
+          <img src="@/assets/tools/layer_down.svg">
         </button>
-        <button class="btn" @click="removeLayer(index)">
-          <img src="../../assets/tools/layer_delete.svg">
+        <button class="btn" @click="hideLayer(index)">
+          <img :src="getImg(value.visible ? 'layer_show.svg' : 'layer_hide.svg')">
         </button>
       </div>
     </div>

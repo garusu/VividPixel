@@ -214,8 +214,10 @@
 
   function getPixelColor(x, y) {
     for (const l of layers.value) {
-      const pixelColor = l.pixels[y * canvasWidth.value + x];
-      if (!transperent.includes(pixelColor)) return pixelColor;
+      if (l.visible) {
+        const pixelColor = l.pixels[y * canvasWidth.value + x];
+        if (!transperent.includes(pixelColor)) return pixelColor;
+      }
     }
     return "#0000";
   }
