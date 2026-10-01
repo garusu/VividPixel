@@ -28,6 +28,9 @@
     padding: 10px 20px;
     box-sizing: border-box;
     background-color: var(--bar-bg);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--bar-dark) var(--bar-bg);
   }
   .tabs {
     width: 10%;

@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { canvasWidth, canvasHeight, renderTrigger } from './store.js';
+import { canvasWidth, canvasHeight, renderTrigger, runErrorMessage } from './store.js';
 
 export class Layer {
   static instances = [];
@@ -82,11 +82,16 @@ export function addLayer(title=`Layer ${counter}`, pixels=false, first=true) {
 }
 
 export function removeLayer(index=0) {
-  layers.value[index].destroy();
-  layers.value.splice(index, 1);
-  renderTrigger.value += 1;
-  if (!layers.value[currentLayer.value]) {
-    currentLayer.value = 0;
+  if (layers.value[index]) {
+    layers.value[index].destroy();
+    layers.value.splice(index, 1);
+    renderTrigger.value += 1;
+    
+    if (!layers.value[currentLayer.value]) {
+      currentLayer.value = 0;
+    }
+  } else {
+    runErrorMessage.value = "Layer";
   }
 }
 
