@@ -94,11 +94,32 @@
     @blur="event => {color.hex = event.target.value}"
     @keyup.enter="event => {color.hex = event.target.value}"
   >
+  <div id="rgb">
+    <input 
+      type="text"
+      :value="color.r" 
+      @blur="event => {color.r = event.target.value}"
+      @keyup.enter="event => {color.r = event.target.value}"
+    >
+    <input 
+      type="text"
+      :value="color.g" 
+      @blur="event => {color.g = event.target.value}"
+      @keyup.enter="event => {color.g = event.target.value}"
+    >
+    <input 
+      type="text"
+      :value="color.b" 
+      @blur="event => {color.b = event.target.value}"
+      @keyup.enter="event => {color.b = event.target.value}"
+    >
+  </div>
 </template>
 
 <style scoped>
   input[type="text"] {
     width: 100%;
+    margin-bottom: 5px;
   }
   .cursor {
     margin: 0;
@@ -112,9 +133,13 @@
   div {
     margin-bottom: 20px;
   }
+  #rgb {
+    display: flex;
+    gap: 5px;
+  }
   #color {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 3 / 2;
     background: 
       linear-gradient(to top, black, transparent), 
       linear-gradient(to right, white, transparent);
