@@ -7,6 +7,7 @@
     watch, 
     computed,
     onMounted,
+    onUnmounted,
     nextTick 
   } from 'vue';
 
@@ -68,6 +69,12 @@
     exportCtx = canvasForExport.value.getContext('2d');
     previewCtx = previewCanvas.value.getContext('2d');
     prepareСanvas(false);
+
+    window.addEventListener("pointerup", mouseUp);
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener("pointerup", mouseUp);
   })
 
   function setPixel(x, y, color, prev=false) {
@@ -527,7 +534,6 @@
     @wheel="wheelScroll" 
     @pointerdown="mouseDown" 
     @pointermove="mouseMove" 
-    @pointerup="mouseUp" 
     @contextmenu.prevent
   >
     <Toolbar />
