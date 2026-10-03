@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
   import { 
     canvasWidth, 
     canvasHeight, 
@@ -8,8 +8,19 @@
     runErrorMessage
   } from './store.js';
 
-  const widthInput = ref(null);
-  const heightInput = ref(null);
+  const widthInput = ref(16);
+  const heightInput = ref(16);
+
+  const refWidthInput = ref(null);
+
+  const ratio = computed(() => {
+    const max = Math.max(widthInput.value, heightInput.value);
+
+    return {  
+      width: Math.round(widthInput.value / max * 50) + "%",
+      height: Math.round(heightInput.value / max * 50) + "%"
+    }
+  });
 
   function newCanvas(preset=0) {
     if (preset) {
@@ -17,10 +28,10 @@
       canvasWidth.value = preset;
       canvasResizeTrigger.value += 1;
       windowBlock.value = false;
-    } else if (parseInt(widthInput.value.value) < 257 && parseInt(heightInput.value.value) < 257) {
-      canvasHeight.value = parseInt(widthInput.value.value);
-      canvasWidth.value = parseInt(heightInput.value.value);
-      canvasResizeTrigger.value += 1
+    } else if (widthInput.value < 257 && heightInput.value < 257) {
+      canvasHeight.value = heightInput.value;
+      canvasWidth.value = widthInput.value;
+      canvasResizeTrigger.value += 1;
       windowBlock.value = false;
     } else {
       runErrorMessage.value = "Create";
@@ -32,12 +43,27 @@
   <div id="window" v-if="windowBlock">
     <div id="block">
       <div id="preview">
-        <div></div>
+        <div :style="{ width: ratio.width, height: ratio.height }"></div>
       </div>
       <div id="settings">
         <h2>Create Canvas</h2>
-        <label>Width <input type="text" ref="widthInput" value="16"></label>
-        <label>Height <input type="text" ref="heightInput" value="16"></label>
+        <label>
+          Width 
+          <input 
+            @keyup.enter="refWidthInput.focus()" 
+            type="text" 
+            v-model.number="widthInput"
+          >
+        </label>
+        <label>
+          Height 
+          <input 
+            ref="refWidthInput"
+            @keyup.enter="newCanvas()"  
+            type="text" 
+            v-model.number="heightInput"
+          >
+        </label>
         <div id="preset">
           <p>Preset</p>
           <button @click="newCanvas(8)">8x8</button>
@@ -86,6 +112,7 @@
         background-color: whitesmoke;
         border-radius: 4px;
         border: 1px solid grey;
+        transition: width 0.2s ease, height 0.2s ease;
       }
     }
     #settings {
