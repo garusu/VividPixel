@@ -34,12 +34,13 @@
   } from './layer.js';
 
   const canvas = ref(null);
-  const canvasForExport = ref(null);
-  const previewCanvas = ref(null);
-
   let ctx;
-  let exportCtx;
+  
+  const previewCanvas = ref(null);
   let previewCtx;
+
+  const canvasForExport = document.createElement("canvas");
+  let exportCtx = canvasForExport.getContext("2d");
 
   let prevPix;
   const filledPrevPix = new Set();
@@ -66,7 +67,6 @@
   
   onMounted(() => {
     ctx = canvas.value.getContext('2d');
-    exportCtx = canvasForExport.value.getContext('2d');
     previewCtx = previewCanvas.value.getContext('2d');
     prepareСanvas(false);
 
@@ -487,17 +487,20 @@
         openFile(true);
         break;
       case "Export":
+        canvasForExport.width = canvasWidth.value;
+        canvasForExport.height = canvasHeight.value;
+
         for (let y = 0; y < canvasHeight.value; y++) {
           for (let x = 0; x < canvasWidth.value; x++) {
-            layers.value.toReversed().forEach((value, index) => {
-              exportCtx.fillStyle = value.pixels[y * canvasWidth.value + x];
-              exportCtx.fillRect(x, y, 1, 1);
-            });
+            const pixel = getPixelColor(x, y);
+
+            exportCtx.fillStyle = pixel;
+            exportCtx.fillRect(x, y, 1, 1);
           }
         }
         const link = document.createElement('a');
         link.download = `${prompt("File Name:")?.trim() || "Untitled"}.png`;
-        link.href = canvasForExport.value.toDataURL("image/png");
+        link.href = canvasForExport.toDataURL("image/png");
         link.click();
         break;
       case "Reset":
@@ -562,12 +565,6 @@
         height: ratio.height + 'px',
         scale: canvasScale
       }"
-    ></canvas>
-    <canvas 
-      ref="canvasForExport" 
-      :width="canvasWidth" 
-      :height="canvasHeight" 
-      style="display: none;"
     ></canvas>
   </div>
 </template>
