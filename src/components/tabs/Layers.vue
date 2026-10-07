@@ -1,16 +1,43 @@
 <script setup>
-  import { layers, currentLayer, addLayer, removeLayer, moveLayer, hideLayer } from '../layer.js';
+  import { 
+    layers, 
+    currentLayer, 
+    addLayer, 
+    removeLayer, 
+    moveLayer, 
+    hideLayer, 
+    undoLayer,
+    layerExists,
+    undoLayerExists
+  } from '../layer.js';
   import { getImg } from '../store.js';
 </script>
 
 <template>
   <div id="layers">
     <div id="panel">
-      <button class="btn" style="margin: 0;" @click="addLayer()">
+      <button 
+        class="btn" 
+        style="margin: 0;" 
+        @click="addLayer()"
+      >
         <img src="@/assets/tools/layer_add.svg">
       </button>
-      <button class="btn" style="margin: 0;" @click="removeLayer(currentLayer)">
+      <button 
+        class="btn" 
+        :class="{ disable: layerExists }" 
+        style="margin: 0;" 
+        @click="removeLayer(currentLayer)"
+      >
         <img src="@/assets/tools/layer_delete.svg">
+      </button>
+      <button 
+        class="btn" 
+        :class="{ disable: undoLayerExists }" 
+        style="margin: 0;" 
+        @click="undoLayer()"
+      >
+        <img src="@/assets/tools/layer_undo.svg">
       </button>
     </div>
     <div 
@@ -93,5 +120,8 @@
   }
   .active {
     text-decoration: underline;
+  }
+  .disable {
+    opacity: 0.5;
   }
 </style>

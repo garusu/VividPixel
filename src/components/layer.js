@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { canvasWidth, canvasHeight, renderTrigger, runErrorMessage } from './store.js';
 
 export class Layer {
@@ -63,11 +63,20 @@ export class Layer {
   }
 }
 
-let counter = 2
+let counter = 2;
+const deletedLayers = ref([]); 
 
-export let layers = ref([
+export const layerExists = computed(() => {
+  return !layers.value.length > 0
+});
+
+export const undoLayerExists = computed(() => {
+  return !deletedLayers.value.length > 0
+});
+
+export const layers = ref([
   new Layer("Layer 1")
-])
+]);
 
 export let currentLayer = ref(0);
 
@@ -83,9 +92,14 @@ export function addLayer(title=`Layer ${counter}`, pixels=false, first=true) {
 
 export function removeLayer(index=0) {
   if (layers.value[index]) {
-    layers.value[index].destroy();
+    deletedLayers.value.push([layers.value[index], index])
     layers.value.splice(index, 1);
     renderTrigger.value += 1;
+
+    if (deletedLayers.value.length > 3) {
+      deletedLayers.value[0][0].destroy();
+      deletedLayers.value.shift();
+    }
     
     if (!layers.value[currentLayer.value]) {
       currentLayer.value = 0;
@@ -113,6 +127,17 @@ export function getLayers() {
     layersData[l.title] = l.pixels;
   }
   return layersData;
+}
+
+export function undoLayer() {
+  if (deletedLayers.value.length > 0) {
+    const lastDelLayer = deletedLayers.value.at(-1);
+    layers.value.splice(lastDelLayer[1], 0, lastDelLayer[0]);
+    deletedLayers.value.pop();
+    renderTrigger.value += 1;
+  } else {
+    runErrorMessage.value = "Layer";
+  }
 }
 
 export function resetLayers(all=false) {
