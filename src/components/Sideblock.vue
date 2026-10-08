@@ -25,9 +25,10 @@
   .block {
     width: 90%;
     height: 50%;
-    padding: 10px 20px;
+    padding: 10px 10px;
     box-sizing: border-box;
     background-color: var(--bar-bg);
+    scrollbar-gutter: stable both-edges;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--bar-dark) var(--bar-bg);

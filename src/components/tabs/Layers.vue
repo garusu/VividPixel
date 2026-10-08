@@ -17,24 +17,21 @@
   <div id="layers">
     <div id="panel">
       <button 
-        class="btn" 
-        style="margin: 0;" 
+        class="btn m"
         @click="addLayer()"
       >
         <img src="@/assets/tools/layer_add.svg">
       </button>
       <button 
-        class="btn" 
+        class="btn m" 
         :class="{ disable: layerExists }" 
-        style="margin: 0;" 
         @click="removeLayer(currentLayer)"
       >
         <img src="@/assets/tools/layer_delete.svg">
       </button>
       <button 
-        class="btn" 
+        class="btn m" 
         :class="{ disable: undoLayerExists }" 
-        style="margin: 0;" 
         @click="undoLayer()"
       >
         <img src="@/assets/tools/layer_undo.svg">
@@ -68,13 +65,6 @@
 </template>
 
 <style scoped>
-  input {
-    appearance: auto;
-    -webkit-appearance: auto;
-  }
-  img {
-    width: 100%;
-  }
   #panel {
     display: flex;
     box-sizing: border-box;
@@ -117,6 +107,9 @@
     &:hover {
       background-color: var(--bar-active);
     }
+  }
+  .m {
+    margin: 0;
   }
   .active {
     text-decoration: underline;

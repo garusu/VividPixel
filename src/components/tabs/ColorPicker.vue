@@ -14,6 +14,9 @@
   }
   const mouseUp = () => dragging = false;
 
+  const palette = ref(["#111", "#F33", "#3F3", "#33F"]);
+  const selectedTool = ref(0);
+
   onMounted(() => {
     color.square.value = square.value;
     color.hue.value = hue.value;
@@ -55,6 +58,19 @@
       );
 
       color.hsv.h = color.hueX.value / color.hue.value.offsetWidth * 360;
+    }
+  }
+
+  function usePalette(index) {
+    if (selectedTool.value == 0) {
+      color.hex = palette.value[index];
+    } else if (selectedTool.value == 1) {
+      palette.value.splice(index, 1);
+    }
+  }
+  function addColor(value) {
+    if (!palette.value.includes(value)) {
+      palette.value.unshift(value);
     }
   }
 </script>
@@ -114,9 +130,64 @@
       @keyup.enter="event => {color.b = event.target.value}"
     >
   </div>
+  <div id="palette-settings">
+    <button 
+      title="Pick" 
+      :class="{ active: selectedTool == 0  }" 
+      @click="selectedTool = 0"
+    >
+      <img src="@/assets/tools/cursor.svg">
+    </button>
+    <button 
+      title="Delete" 
+      :class="{ active: selectedTool == 1  }" 
+      @click="selectedTool = 1"
+    >
+      <img src="@/assets/tools/layer_delete.svg">
+    </button>
+  </div>
+  <div id="palette">
+    <div 
+      title="Add"
+      :style="{ backgroundColor: color.hex }" 
+      @click="addColor(color.hex)"
+    >
+      <img src="@/assets/tools/layer_add.svg">
+    </div>
+    <div 
+      v-for="(value, index) in palette" 
+      :title="value" 
+      :style="{ backgroundColor: value}" 
+      @click="usePalette(index)"
+    ></div>
+  </div>
 </template>
 
 <style scoped>
+  img {
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  button {
+    border: none;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 4px;
+    height: 25px;
+    aspect-ratio: 1;
+
+    img {
+      padding: 0;
+    }
+
+    &:hover {
+      background-color: var(--bar-active);
+    }
+  }
+  .active {
+    background-color: var(--bar-active);
+  }
   input[type="text"] {
     width: 100%;
     margin-bottom: 5px;
@@ -155,6 +226,28 @@
 
     .cursor {
       translate: -50% -4px;
+    }
+  }
+  #palette-settings {
+    width: 100%;
+    height: 29px;
+    padding: 2px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    background-color: var(--other);
+  }
+  #palette {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 5px;
+
+    div {
+      width: 51px;
+      height: 51px;
+      background-color: black;
+      margin: 0;
     }
   }
 </style>
