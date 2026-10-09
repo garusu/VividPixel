@@ -14,7 +14,7 @@
 body {
 	margin: 0;
 	line-height: 1.15;
-	font-family: Arial;
+	font-family: sans-serif;
 	font-size: 16px;
 	background-color: var(--bar-canvas);
 	overflow: clip;
@@ -26,6 +26,10 @@ label, h2, p {
 }
 img {
 	width: 100%;
+}
+button {
+  cursor: pointer;
+  font-family: inherit;
 }
 input[type="text"] {
   all: unset;
@@ -42,4 +46,28 @@ input[type="text"] {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
+}
+.sidebar-panel {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  background-color: var(--other);
+  padding: 2px;
+  border-radius: 6px;
+}
+.btn {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  border-radius: 4px;
+  height: 25px;
+  aspect-ratio: 1;
+  margin-left: 5px;
+
+  &:hover {
+    background-color: var(--bar-active);
+  }
+}
+.m0 {
+  margin: 0;
 }

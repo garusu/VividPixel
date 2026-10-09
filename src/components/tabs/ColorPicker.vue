@@ -14,7 +14,7 @@
   }
   const mouseUp = () => dragging = false;
 
-  const palette = ref(["#111", "#F33", "#3F3", "#33F"]);
+  const palette = ref(["#111111", "#DD3333", "#33DD33", "#3333DD"]);
   const selectedTool = ref(0);
 
   onMounted(() => {
@@ -106,33 +106,35 @@
   <input
     maxlength="7"
     type="text"
+    id="hex"
     :value="color.hex" 
     @blur="event => {color.hex = event.target.value}"
     @keyup.enter="event => {color.hex = event.target.value}"
   >
   <div id="rgb">
-    <input 
+    <div class="input-text" data-text="R"><input 
       type="text"
       :value="color.r" 
       @blur="event => {color.r = event.target.value}"
       @keyup.enter="event => {color.r = event.target.value}"
-    >
-    <input 
+    ></div>
+    <div class="input-text" data-text="G"><input 
       type="text"
       :value="color.g" 
       @blur="event => {color.g = event.target.value}"
       @keyup.enter="event => {color.g = event.target.value}"
-    >
-    <input 
+    ></div>
+    <div class="input-text" data-text="B"><input 
       type="text"
       :value="color.b" 
       @blur="event => {color.b = event.target.value}"
       @keyup.enter="event => {color.b = event.target.value}"
-    >
+    ></div>
   </div>
-  <div id="palette-settings">
+  <div class="sidebar-panel">
     <button 
       title="Pick" 
+      class="btn m0" 
       :class="{ active: selectedTool == 0  }" 
       @click="selectedTool = 0"
     >
@@ -140,6 +142,7 @@
     </button>
     <button 
       title="Delete" 
+      class="btn m0" 
       :class="{ active: selectedTool == 1  }" 
       @click="selectedTool = 1"
     >
@@ -165,32 +168,29 @@
 
 <style scoped>
   img {
-    padding: 10px;
     box-sizing: border-box;
-  }
-  button {
-    border: none;
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-    border-radius: 4px;
-    height: 25px;
-    aspect-ratio: 1;
-
-    img {
-      padding: 0;
-    }
-
-    &:hover {
-      background-color: var(--bar-active);
-    }
   }
   .active {
     background-color: var(--bar-active);
   }
   input[type="text"] {
     width: 100%;
+    line-height: 100%;
+  }
+  #hex {
     margin-bottom: 5px;
+  }
+  .input-text {
+    display: flex;
+    position: relative;
+    align-items: center;
+    margin: 0;
+  }
+  .input-text::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 7px;
+    color: var(--bar-dark);
   }
   .cursor {
     margin: 0;
@@ -228,26 +228,26 @@
       translate: -50% -4px;
     }
   }
-  #palette-settings {
-    width: 100%;
-    height: 29px;
-    padding: 2px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    border-radius: 6px;
-    background-color: var(--other);
-  }
   #palette {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
     gap: 5px;
 
+    img {
+      padding: 7px;
+    }
+
     div {
       width: 51px;
       height: 51px;
       background-color: black;
       margin: 0;
+      transition: transform 0.1s ease-in-out;
+
+      &:hover {
+        transform: scale(0.9);
+      }
     }
   }
 </style>

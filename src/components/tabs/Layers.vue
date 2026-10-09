@@ -15,22 +15,22 @@
 
 <template>
   <div id="layers">
-    <div id="panel">
+    <div class="sidebar-panel">
       <button 
-        class="btn m"
+        class="btn m0"
         @click="addLayer()"
       >
         <img src="@/assets/tools/layer_add.svg">
       </button>
       <button 
-        class="btn m" 
+        class="btn m0" 
         :class="{ disable: layerExists }" 
         @click="removeLayer(currentLayer)"
       >
         <img src="@/assets/tools/layer_delete.svg">
       </button>
       <button 
-        class="btn m" 
+        class="btn m0" 
         :class="{ disable: undoLayerExists }" 
         @click="undoLayer()"
       >
@@ -65,14 +65,6 @@
 </template>
 
 <style scoped>
-  #panel {
-    display: flex;
-    box-sizing: border-box;
-    width: 100%;
-    background-color: var(--other);
-    padding: 2px;
-    border-radius: 6px;
-  }
   .layer {
     display: flex;
     align-items: center;
@@ -94,22 +86,6 @@
   }
   .right {
     height: 25px;
-  }
-  .btn {
-    border: none;
-    padding: 0;
-    background-color: transparent;
-    border-radius: 4px;
-    height: 25px;
-    aspect-ratio: 1;
-    margin-left: 5px;
-
-    &:hover {
-      background-color: var(--bar-active);
-    }
-  }
-  .m {
-    margin: 0;
   }
   .active {
     text-decoration: underline;
