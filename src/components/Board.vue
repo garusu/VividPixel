@@ -154,11 +154,14 @@
         case 4: // Rectangle
           action = "square";
           break;
+        case 5: // Ellipse
+          action = "ellipse";
+          break;
         case 2: // Eyedropper
           if (last.x < 0 || last.y < 0 || last.x >= canvasWidth.value || last.y >= canvasHeight.value) return;
           color.hex = getPixelColor(last.x, last.y) || color.hex;
           break;
-        case 5: // Drag
+        case 6: // Drag
           action = "drag";
           offset = [
             event.clientX - canvasPos.x,
@@ -191,6 +194,8 @@
       drawLine(last.x, last.y, pos.x, pos.y, "#0000", true);
     } else if (action == "square") {
       drawSquare(last.x, last.y, pos.x, pos.y, "#0000", true);
+    } else if (action == "ellipse") {
+      drawEllipse(last.x, last.y, pos.x, pos.y, "#0000", true);
     }
   }
 
@@ -202,6 +207,9 @@
       drawLine(last.x, last.y, pos.x, pos.y, color.hex);
     } else if (action == "square") {
       drawSquare(last.x, last.y, pos.x, pos.y, color.hex);
+      clearPrev();
+    } else if (action == "ellipse") {
+      drawEllipse(last.x, last.y, pos.x, pos.y, color.hex);
       clearPrev();
     }
 
@@ -293,6 +301,89 @@
         let e2 = 2 * err;
         if (e2 > -dy) { err -= dy; x0 += sx; }
         if (e2 < dx) { err += dx; y0 += sy; }
+      }
+    }
+  }
+
+  function drawEllipse(x0, y0, x1, y1, color, prev=false) {
+    const fill = tools[selectedTool.value].flags["Fill"];
+
+    let startX = Math.min(x0, x1);
+    let startY = Math.min(y0, y1);
+    let endX = Math.max(x0, x1);
+    let endY = Math.max(y0, y1);
+
+    const width = endX - startX + 1;
+    const height = endY - startY + 1;
+
+    if (prev) clearPrev();
+    if (width == 1 || height == 1) {
+      drawLine(startX, startY, endX, endY, color, prev);
+      return;
+    }
+
+    if (fill) {
+      const cx = (startX + endX) / 2;
+      const cy = (startY + endY) / 2;
+      const rx = width / 2;
+      const ry = height / 2;
+
+      for (let y = startY; y <= endY; y++) {
+        const ny = (y - cy) / ry;
+        const inside = 1 - ny * ny;
+
+        if (inside < 0) continue;
+
+        const dx = rx * Math.sqrt(inside);
+        const left = Math.ceil(cx - dx);
+        const right = Math.floor(cx + dx);
+
+        for (let x = left; x <= right; x++) {
+          setPixel(x, y, color, prev);
+        }
+      }
+    } else {
+      let a = endX - startX;
+      let b = endY - startY;
+      let b1 = b & 1;
+
+      let dx = 4 * (1 - a) * b * b;
+      let dy = 4 * (b1 + 1) * a * a;
+      let err = dx + dy + b1 * a * a;
+      let e2;
+
+      startY += Math.floor((b + 1) / 2);
+      endY = startY - b1;
+
+      a *= 8 * a;
+      b1 = 8 * b * b;
+
+      do {
+        setPixel(endX, startY, color, prev);
+        setPixel(startX, startY, color, prev);
+        setPixel(startX, endY, color, prev);
+        setPixel(endX, endY, color, prev);
+
+        e2 = 2 * err;
+
+        if (e2 <= dy) {
+          startY++;
+          endY--;
+          err += (dy += a);
+        }
+
+        if (e2 >= dx || 2 * err > dy) {
+          startX++;
+          endX--;
+          err += (dx += b1);
+        }
+      } while (startX <= endX);
+
+      while (startY - endY < b) {
+        setPixel(startX - 1, startY, color, prev);
+        setPixel(endX + 1, startY++, color, prev);
+        setPixel(startX - 1, endY, color, prev);
+        setPixel(endX + 1, endY--, color, prev);
       }
     }
   }

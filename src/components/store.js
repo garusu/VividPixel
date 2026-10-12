@@ -70,8 +70,10 @@ export const tools = [
   (new Tool("Line", "line.svg", "L"))
     .setFlags("Perpendicular", false),
   (new Tool("Rectangle", "square.svg", "R"))
-    .setFlags("Fill", true)
+    .setFlags("Fill", false)
     .setFlags("Square", false),
+  (new Tool("Ellipse", "circle.svg", "C"))
+    .setFlags("Fill", false),
   (new Tool("Drag", "drag.svg", "G"))
 ];
 
