@@ -11,6 +11,19 @@
     undoLayerExists
   } from '../layer.js';
   import { getImg } from '../store.js';
+  import { ref, nextTick } from 'vue';
+
+  const isDisabled = ref(null);
+
+  function rename(title, value) {
+    value.title = title;
+    isDisabled.value = null;
+  }
+
+  function select(event, value) {
+    isDisabled.value = value.id;
+    event.target.select();
+  }
 </script>
 
 <template>
@@ -42,13 +55,16 @@
       :key="value.id"
       class="layer"
     >
-      <button 
+      <input 
         class="title"
         :class="{ active: currentLayer == index }"
+        :value="value.title" 
+        :readonly="isDisabled !== value.id"
         @click="currentLayer = index"
+        @dblclick="(elem) => select(elem, value)"
+        @blur="(elem) => rename(elem.target.value, value)"
+        @keyup.enter="(elem) => rename(elem.target.value, value)"
       >
-        {{ value.title }}
-      </button>
       <div class="right">
         <button class="btn" @click="moveLayer(-1, index)">
           <img src="@/assets/tools/layer_up.svg">
@@ -72,12 +88,14 @@
     padding: 5px 0;
   }
   .title {
+    all: unset;
+    width: 100%;
     border: none;
     background-color: transparent;
     color: inherit;
     font-size: inherit;
-    flex: 1;
     text-align: left;
+    flex: 1;
     padding-left: 0;
 
     &:hover {
