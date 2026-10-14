@@ -16,7 +16,7 @@
   const isDisabled = ref(null);
 
   function rename(title, value) {
-    value.title = title;
+    value.title = title.trim() || "Unnamed";
     isDisabled.value = null;
   }
 
