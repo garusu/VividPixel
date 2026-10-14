@@ -25,7 +25,6 @@
   } from './store.js';
 
   import { 
-    Layer,
     layers,
     currentLayer,
     resetLayers, 
@@ -106,7 +105,7 @@
   }
 
   function prepareСanvas() {
-    Layer.reset();
+    resetLayers();
     prevPix = Array(canvasWidth.value * canvasHeight.value).fill(null);
     render();
   }

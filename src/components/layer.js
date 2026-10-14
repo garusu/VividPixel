@@ -1,8 +1,7 @@
 import { ref, computed } from 'vue';
 import { canvasWidth, canvasHeight, renderTrigger, runErrorMessage } from './store.js';
 
-export class Layer {
-  static instances = [];
+class Layer {
   static counter = 0;
 
   constructor(title, pix=false) {
@@ -14,15 +13,7 @@ export class Layer {
     this.history = [];
     this.undoHistory = [];
 
-    Layer.instances.push(this);
     Layer.counter += 1;
-  }
-  destroy() {
-    const index = Layer.instances.indexOf(this);
-
-    if (index !== -1) {
-      Layer.instances.splice(index, 1);
-    }
   }
   updateBackup() {
     this.pixelsBackup = [...this.pixels];
@@ -52,14 +43,6 @@ export class Layer {
   }
   softReset() {
     this.pixels = Array(canvasWidth.value * canvasHeight.value).fill("#0000");
-  }
-  static reset() {
-    Layer.instances.forEach(obj => {
-      obj.pixels = Array(canvasWidth.value * canvasHeight.value).fill("#0000");
-      obj.pixelsBackup = [...obj.pixels];
-      obj.history = [];
-      obj.undoHistory = [];
-    })
   }
 }
 
@@ -97,7 +80,6 @@ export function removeLayer(index=0) {
     renderTrigger.value += 1;
 
     if (deletedLayers.value.length > 3) {
-      deletedLayers.value[0][0].destroy();
       deletedLayers.value.shift();
     }
     
