@@ -158,7 +158,8 @@
           break;
         case 2: // Eyedropper
           if (last.x < 0 || last.y < 0 || last.x >= canvasWidth.value || last.y >= canvasHeight.value) return;
-          color.hex = getPixelColor(last.x, last.y) || color.hex;
+          const eyedropper = getPixelColor(last.x, last.y, true)[0] || color.hex;
+          if (!transperent.includes(eyedropper)) color.hex = eyedropper;
           break;
         case 6: // Drag
           action = "drag";
@@ -226,14 +227,33 @@
     };
   }
 
-  function getPixelColor(x, y) {
+  function opacity(hex) {
+    const hexa = hex.substring(7, 9);
+
+    if (hexa == "FF" || hexa == 0) return true;
+    else return false;
+  }
+
+  function getPixelColor(x, y, limit=false) {
+    const pixelsArray = [];
+
     for (const l of layers.value) {
       if (l.visible) {
         const pixelColor = l.pixels[y * canvasWidth.value + x];
-        if (!transperent.includes(pixelColor)) return pixelColor;
+
+        if (!transperent.includes(pixelColor)) {
+          pixelsArray.unshift(pixelColor);
+
+          if (opacity(pixelColor) || limit) return pixelsArray;
+        }
       }
     }
-    return "#0000";
+    if (pixelsArray.length > 0) {
+      pixelsArray.unshift("#0000");
+      return pixelsArray;
+    } else {
+      return ["#0000"];
+    }
   }
 
   function render() {
@@ -247,17 +267,19 @@
   function softRender(x, y) {
     const pixel = getPixelColor(x, y);
 
-    if (pixel == "#0000") {
-      if ((x + y) % 2 === 1) {
-        ctx.fillStyle = "#e6e6e6";
-        ctx.fillRect(x, y, 1, 1);
+    for (const p of pixel) {
+      if (p == "#0000") {
+        if ((x + y) % 2 === 1) {
+          ctx.fillStyle = "#e6e6e6";
+          ctx.fillRect(x, y, 1, 1);
+        } else {
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(x, y, 1, 1);
+        }
       } else {
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = p;
         ctx.fillRect(x, y, 1, 1);
       }
-    } else {
-      ctx.fillStyle = pixel;
-      ctx.fillRect(x, y, 1, 1);
     }
   }
 
@@ -584,8 +606,10 @@
           for (let x = 0; x < canvasWidth.value; x++) {
             const pixel = getPixelColor(x, y);
 
-            exportCtx.fillStyle = pixel;
-            exportCtx.fillRect(x, y, 1, 1);
+            for (const p of pixel) {
+              exportCtx.fillStyle = p;
+              exportCtx.fillRect(x, y, 1, 1);
+            }
           }
         }
         const link = document.createElement('a');

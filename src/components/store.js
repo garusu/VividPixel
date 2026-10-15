@@ -110,18 +110,20 @@ class Color {
       s: s,
       v: v
     })
+
+    this._alpha = ref(255);
     
     this.rgb = computed({
       get: () => {
-        return hsvToRgb(this.hsv)
+        return hsvToRgb(this.hsv);
       },
       set: (value) => {
-        value = RgbToHsv(value)
-        Object.assign(this.hsv, value)
+        value = RgbToHsv(value);
+        Object.assign(this.hsv, value);
 
-        this.hueX.value = (value.h / 360) * this.hue.value.offsetWidth
-        this.squareX.value = value.s * this.square.value.offsetWidth
-        this.squareY.value = (1 - value.v) * this.square.value.offsetHeight
+        this.hueX.value = (value.h / 360) * this.hue.value.offsetWidth;
+        this.squareX.value = value.s * this.square.value.offsetWidth;
+        this.squareY.value = (1 - value.v) * this.square.value.offsetHeight;
       }
     })
 
@@ -129,49 +131,74 @@ class Color {
       get: () => {
         return (
           "#" +
-          this.rgb.value.r.toString(16).padStart(2, "0") +
-          this.rgb.value.g.toString(16).padStart(2, "0") +
-          this.rgb.value.b.toString(16).padStart(2, "0")
+          colorToHex(this.rgb.value.r) +
+          colorToHex(this.rgb.value.g) +
+          colorToHex(this.rgb.value.b) +
+          colorToHex(this._alpha.value)
         ).toUpperCase();
       },
       set: (value) => {
         value = value.trim();
         value = value.replace('#', '');
 
-        if (!/^[0-9A-Fa-f]+$/.test(value)) {value = "ffffff"}
-        if (value.length == 3) { value = value.split("").map(e => e + e).join("") }
+        if (!/^[0-9A-Fa-f]+$/.test(value)) value = "ffffff";
+
+        if (value.length == 3 || value.length == 4) {
+          value = value.split("").map(e => e + e).join("");
+        }
+
+        let hexa;
+
+        if (value.length == 8) {
+          hexa = hexToColor(value.slice(-2));
+          value = value.slice(0, -2);
+        } else {
+          hexa = 255;
+        }
+
+        this._alpha.value = hexa;
+        this.alphaX.value = (hexa / 255) * this.alpha.value.offsetWidth;
 
         if (value.length == 6) {
           this.rgb.value = {
-            r: parseInt(value.substring(0, 2), 16),
-            g: parseInt(value.substring(2, 4), 16),
-            b: parseInt(value.substring(4, 6), 16)
+            r: hexToColor(value.substring(0, 2)),
+            g: hexToColor(value.substring(2, 4)),
+            b: hexToColor(value.substring(4, 6))
           }
         }
       }
     })
+
     this.squareX = ref(0);
     this.squareY = ref(183.33);
     this.hueX = ref(0);
+    this.alphaX = ref(275);
+
 
     this.hue = ref(null);
     this.square = ref(null);
+    this.alpha = ref(null);
   }
 
   get cssCleanColor() {
-    return `hsl(${this.hsv.h}deg 100% 50%)`
+    return `hsl(${this.hsv.h}deg 100% 50%)`;
   }
   get r() {
-    return this.rgb.value.r 
+    return this.rgb.value.r;
   }
   get g() {
-    return this.rgb.value.g 
+    return this.rgb.value.g;
   }
   get b() {
-    return this.rgb.value.b
+    return this.rgb.value.b;
+  }
+  get a() {
+    return this._alpha.value;
   }
   get hex() {
-    return this._hex.value
+    return this._hex.value.substring(7, 9) == "FF" 
+      ? this._hex.value.slice(0, -2) 
+      : this._hex.value;
   }
   set r(value) {
     this.changeRgb(value, "r");
@@ -181,6 +208,9 @@ class Color {
   }
   set b(value) {
     this.changeRgb(value, "b");
+  }
+  set a(value) {
+    this._alpha.value = value;
   }
   set hex(value) {
     this._hex.value = value;
@@ -251,6 +281,13 @@ function RgbToHsv(rgb) {
     s: v && c / v,
     v: v
   }
+}
+
+function colorToHex(value) {
+  return Math.round(value).toString(16).padStart(2, "0");
+}
+function hexToColor(hex) {
+  return parseInt(hex, 16)
 }
 
 export const color = new Color();

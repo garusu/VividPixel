@@ -26,6 +26,7 @@
     width: 90%;
     height: 50%;
     padding: 10px 10px;
+    padding-bottom: 0;
     box-sizing: border-box;
     background-color: var(--bar-bg);
     scrollbar-gutter: stable both-edges;

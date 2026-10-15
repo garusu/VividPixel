@@ -4,6 +4,7 @@
 
   const hue = ref(null);
   const square = ref(null);
+  const alpha = ref(null);
 
   let dragging = false;
 
@@ -20,6 +21,7 @@
   onMounted(() => {
     color.square.value = square.value;
     color.hue.value = hue.value;
+    color.alpha.value = alpha.value;
     document.addEventListener('pointerup', mouseUp);
     document.addEventListener("pointermove", mouseMove);
   });
@@ -47,8 +49,8 @@
 
       color.hsv.s = color.squareX.value / square.value.offsetWidth;
       color.hsv.v = 1 - color.squareY.value / color.square.value.offsetHeight;
-    }
-    else if (dragging == "hue") {
+
+    } else if (dragging == "hue") {
       color.hueX.value = Math.max(
         0,
         Math.min(
@@ -58,6 +60,17 @@
       );
 
       color.hsv.h = color.hueX.value / color.hue.value.offsetWidth * 360;
+
+    } else if (dragging == "alpha") {
+      color.alphaX.value = Math.max(
+        0,
+        Math.min(
+          event.clientX - color.alpha.value.getBoundingClientRect().left,
+          color.alpha.value.offsetWidth
+        )
+      );
+
+      color.a = color.alphaX.value / color.alpha.value.offsetWidth * 255;
     }
   }
 
@@ -91,6 +104,7 @@
     ></div>
   </div>
   <div 
+    class="slider" 
     id="hue"
     ref="hue"
     @pointerdown.left="mouseDown('hue', $event)"
@@ -103,8 +117,22 @@
       }"
     ></div>
   </div>
+  <div 
+    class="slider"
+    id="alpha"
+    ref="alpha"
+    @pointerdown.left="mouseDown('alpha', $event)"
+  >
+    <div 
+      class="cursor"
+      :style="{
+        left: `${color.alphaX.value}px` 
+      }"
+    ></div>
+  </div>
+
   <input
-    maxlength="7"
+    maxlength="9"
     type="text"
     id="hex"
     :value="color.hex" 
@@ -219,13 +247,22 @@
       translate: -50% -50%;
     }
   }
-  #hue {
+  .slider {
     width: 100%;
     height: 10px;
-    background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
 
     .cursor {
       translate: -50% -4px;
+    }
+  }
+  #hue {
+    background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+  }
+  #alpha {
+    background: linear-gradient(to right, #fff2, #fff);
+
+    .cursor {
+      background-color: gray;
     }
   }
   #palette {
@@ -233,6 +270,7 @@
     flex-wrap: wrap;
     width: 100%;
     gap: 5px;
+    margin: 0;
 
     img {
       padding: 7px;
