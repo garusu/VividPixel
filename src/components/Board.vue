@@ -21,7 +21,9 @@
     canvasHeight, 
     windowBlock,
     canvasResizeTrigger, 
-    runErrorMessage
+    runErrorMessage,
+    hexToRgba,
+    rgbaToHex
   } from './store.js';
 
   import { 
@@ -158,7 +160,11 @@
           break;
         case 2: // Eyedropper
           if (last.x < 0 || last.y < 0 || last.x >= canvasWidth.value || last.y >= canvasHeight.value) return;
-          const eyedropper = getPixelColor(last.x, last.y, true)[0] || color.hex;
+          const eyedropper = getPixelColor(
+            last.x, 
+            last.y, 
+            tools[selectedTool.value].flags["Layer Only"]
+          ).at(-1) || color.hex;
           if (!transperent.includes(eyedropper)) color.hex = eyedropper;
           break;
         case 6: // Drag
@@ -234,6 +240,32 @@
     else return false;
   }
 
+  function blendColors(blendArray) {
+    let result = hexToRgba(blendArray[0]);
+    result.a /= 255;
+
+    for (let i = 1; i < blendArray.length; i++) {
+      const curColor = hexToRgba(blendArray[i]);
+      curColor.a /= 255;
+
+      const alpha = curColor.a + result.a * (1 - curColor.a);
+
+      if (alpha === 0) return "#0000"; 
+
+      const rgb = {
+        r: Math.round((curColor.r * curColor.a + result.r * result.a * (1 - curColor.a)) / alpha),
+        g: Math.round((curColor.g * curColor.a + result.g * result.a * (1 - curColor.a)) / alpha),
+        b: Math.round((curColor.b * curColor.a + result.b * result.a * (1 - curColor.a)) / alpha),
+        a: alpha
+      };
+
+      result = rgb;
+    }
+    result.a *= 255;
+    const output = rgbaToHex(result);
+    return opacity(output) ? [output] : ["#0000", output];
+  }
+
   function getPixelColor(x, y, limit=false) {
     const pixelsArray = [];
 
@@ -248,9 +280,10 @@
         }
       }
     }
-    if (pixelsArray.length > 0) {
-      pixelsArray.unshift("#0000");
-      return pixelsArray;
+    if (pixelsArray.length == 1) {
+      return ["#0000", ...pixelsArray];
+    } else if (pixelsArray.length >= 2) {
+      return blendColors(pixelsArray);
     } else {
       return ["#0000"];
     }

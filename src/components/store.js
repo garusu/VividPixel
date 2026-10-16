@@ -66,14 +66,15 @@ class Tool {
 export const tools = [
   (new Tool("Pen", "pen.svg", "P")),
   (new Tool("Eraser", "eraser.svg", "E")),
-  (new Tool("Eyedropper", "picker.svg", "I")),
+  (new Tool("Eyedropper", "picker.svg", "I"))
+    .setFlags("Layer Only", true),
   (new Tool("Line", "line.svg", "L"))
     .setFlags("Perpendicular", false),
   (new Tool("Rectangle", "square.svg", "R"))
-    .setFlags("Fill", false)
+    .setFlags("Fill", true)
     .setFlags("Square", false),
   (new Tool("Ellipse", "circle.svg", "C"))
-    .setFlags("Fill", false),
+    .setFlags("Fill", true),
   (new Tool("Drag", "drag.svg", "G"))
 ];
 
@@ -129,43 +130,18 @@ class Color {
 
     this._hex = computed({
       get: () => {
-        return (
-          "#" +
-          colorToHex(this.rgb.value.r) +
-          colorToHex(this.rgb.value.g) +
-          colorToHex(this.rgb.value.b) +
-          colorToHex(this._alpha.value)
-        ).toUpperCase();
+        return rgbaToHex({ ...this.rgb.value, a: this._alpha.value });
       },
       set: (value) => {
-        value = value.trim();
-        value = value.replace('#', '');
-
-        if (!/^[0-9A-Fa-f]+$/.test(value)) value = "ffffff";
-
-        if (value.length == 3 || value.length == 4) {
-          value = value.split("").map(e => e + e).join("");
+        value = hexToRgba(value);
+        this.rgb.value = {
+          r: value.r,
+          g: value.g,
+          b: value.b
         }
 
-        let hexa;
-
-        if (value.length == 8) {
-          hexa = hexToColor(value.slice(-2));
-          value = value.slice(0, -2);
-        } else {
-          hexa = 255;
-        }
-
-        this._alpha.value = hexa;
-        this.alphaX.value = (hexa / 255) * this.alpha.value.offsetWidth;
-
-        if (value.length == 6) {
-          this.rgb.value = {
-            r: hexToColor(value.substring(0, 2)),
-            g: hexToColor(value.substring(2, 4)),
-            b: hexToColor(value.substring(4, 6))
-          }
-        }
+        this._alpha.value = value.a;
+        this.alphaX.value = (value.a / 255) * this.alpha.value.offsetWidth;
       }
     })
 
@@ -288,6 +264,44 @@ function colorToHex(value) {
 }
 function hexToColor(hex) {
   return parseInt(hex, 16)
+}
+
+export function rgbaToHex(rgba) {
+  return (
+    "#" +
+    colorToHex(rgba.r) +
+    colorToHex(rgba.g) +
+    colorToHex(rgba.b) +
+    colorToHex(rgba.a)
+  ).toUpperCase();
+}
+export function hexToRgba(hex) {
+  hex = hex.trim();
+  hex = hex.replace('#', '');
+
+  if (!/^[0-9A-Fa-f]+$/.test(hex)) hex = "ffffff";
+
+  if (hex.length == 3 || hex.length == 4) {
+    hex = hex.split("").map(e => e + e).join("");
+  }
+
+  let hexa;
+
+  if (hex.length == 8) {
+    hexa = hexToColor(hex.slice(-2));
+    hex = hex.slice(0, -2);
+  } else {
+    hexa = 255;
+  }
+
+  if (hex.length == 6) {
+    return {
+      r: hexToColor(hex.substring(0, 2)),
+      g: hexToColor(hex.substring(2, 4)),
+      b: hexToColor(hex.substring(4, 6)),
+      a: hexa
+    }
+  }
 }
 
 export const color = new Color();
