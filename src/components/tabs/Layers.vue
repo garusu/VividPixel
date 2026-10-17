@@ -30,12 +30,14 @@
   <div id="layers">
     <div class="sidebar-panel">
       <button 
+        title="Add"
         class="btn m0"
         @click="addLayer()"
       >
         <img src="@/assets/tools/layer_add.svg">
       </button>
       <button 
+        title="Delete"
         class="btn m0" 
         :class="{ disable: layerExists }" 
         @click="removeLayer(currentLayer)"
@@ -43,6 +45,7 @@
         <img src="@/assets/tools/layer_delete.svg">
       </button>
       <button 
+        title="Undo"
         class="btn m0" 
         :class="{ disable: undoLayerExists }" 
         @click="undoLayer()"

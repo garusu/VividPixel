@@ -15,7 +15,7 @@
   }
   const mouseUp = () => dragging = false;
 
-  const palette = ref(["#111111", "#DD3333", "#33DD33", "#3333DD"]);
+  const palette = ref(["#111111", "#DD3333", "#33DD33", "#3333DD", "#BB33DD"]);
   const selectedTool = ref(0);
 
   onMounted(() => {
@@ -178,19 +178,25 @@
     </button>
   </div>
   <div id="palette">
-    <div 
-      title="Add"
-      :style="{ backgroundColor: color.hex }" 
-      @click="addColor(color.hex)"
-    >
-      <img src="@/assets/tools/layer_add.svg">
+    <div class="color-bg">
+      <div 
+        title="Add"
+        :style="{ backgroundColor: color.hex}" 
+        @click="addColor(color.hex)"
+      >
+        <img src="@/assets/tools/layer_add.svg">
+      </div>
     </div>
     <div 
-      v-for="(value, index) in palette" 
-      :title="value" 
-      :style="{ backgroundColor: value}" 
-      @click="usePalette(index)"
-    ></div>
+      class="color-bg"
+      v-for="(value, index) in palette"
+    >
+      <div
+        :style="{ backgroundColor: value}"
+        :title="value" 
+        @click="usePalette(index)"
+      ></div>
+    </div>
   </div>
 </template>
 
@@ -249,14 +255,15 @@
   }
   .slider {
     width: 100%;
-    height: 10px;
+    height: 14px;
 
     .cursor {
-      translate: -50% -4px;
+      translate: -50% -2px;
     }
   }
   #hue {
     background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+    margin-bottom: 12px;
   }
   #alpha {
     background: linear-gradient(to right, #fff2, #fff);
@@ -277,15 +284,19 @@
     }
 
     div {
-      width: 51px;
-      height: 51px;
-      background-color: black;
+      width: 41.5px;
+      height: 41.5px;
       margin: 0;
-      transition: transform 0.1s ease-in-out;
+      transition: transform 0.2s ease-in-out;
 
       &:hover {
         transform: scale(0.9);
       }
+    }
+
+    .color-bg {
+      background-image: url('@/assets/other/transparent.png');
+      background-size: cover;
     }
   }
 </style>
