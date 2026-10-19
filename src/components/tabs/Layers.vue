@@ -28,7 +28,7 @@
 
 <template>
   <div id="layers">
-    <div class="sidebar-panel">
+    <div class="sidebar-panel" style="margin-bottom: 5px;">
       <button 
         title="Add"
         class="btn m0"
@@ -57,16 +57,16 @@
       v-for="(value, index) in layers"
       :key="value.id"
       class="layer"
+      :class="{ active: currentLayer == index }"
     >
       <input 
         class="title"
-        :class="{ active: currentLayer == index }"
         :value="value.title" 
         :readonly="isDisabled !== value.id"
         @click="currentLayer = index"
-        @dblclick="(elem) => select(elem, value)"
-        @blur="(elem) => rename(elem.target.value, value)"
-        @keyup.enter="(elem) => rename(elem.target.value, value)"
+        @dblclick="select($event, value)"
+        @blur="rename($event.target.value, value)"
+        @keyup.enter="rename($event.target.value, value)"
       >
       <div class="right">
         <button class="btn" @click="moveLayer(-1, index)">
@@ -88,7 +88,8 @@
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 5px 0;
+    padding: 5px 5px;
+    box-sizing: border-box;
   }
   .title {
     all: unset;
@@ -100,6 +101,7 @@
     text-align: left;
     flex: 1;
     padding-left: 0;
+    border-radius: 4px;
 
     &:hover {
       text-decoration: underline;
@@ -109,7 +111,10 @@
     height: 25px;
   }
   .active {
-    text-decoration: underline;
+    font-weight: bold;
+    &::before {
+      content: "‣\00a0";
+    }
   }
   .disable {
     opacity: 0.5;
