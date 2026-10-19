@@ -79,7 +79,7 @@ export const tools = [
 ];
 
 function handleKeyDown(event) {
-  if (event.target.tagName === "INPUT" && !['checkbox', 'button'].includes(event.target.type)) return;
+  if (event.target.isContentEditable || event.target.matches('input:not([readonly]):not([type="checkbox"]):not([type="radio"])')) return;
   if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
     event.preventDefault()
   }
@@ -90,8 +90,6 @@ function handleKeyDown(event) {
     event.altKey && 'Alt',
     event.code.replace("Key", "").replace("Numpad", "")
   ].filter(Boolean).join(' + ');
-
-  console.log(key)
 
   let func = tools.find(obj => obj.hotkey == key);
   
