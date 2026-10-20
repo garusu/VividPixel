@@ -79,7 +79,11 @@ export const tools = [
 ];
 
 function handleKeyDown(event) {
-  if (event.target.isContentEditable || event.target.matches('input:not([readonly]):not([type="checkbox"]):not([type="radio"])')) return;
+  if (
+    event.target.isContentEditable || 
+    event.target.matches('input:not([readonly]):not([type="checkbox"]):not([type="radio"])')
+  ) return;
+
   if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
     event.preventDefault()
   }
@@ -95,7 +99,7 @@ function handleKeyDown(event) {
   
   if (func) selectedTool.value = tools.indexOf(func);
   else {
-    func = menuItems.find(level1 => level1.some(level2 => level2.includes(key)))?.find(level2 => level2.includes(key));
+    func = menuItems.flat().find(item => item.includes(key));
     if (func) runFunc.value = func[0];
   }
 };

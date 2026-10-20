@@ -101,7 +101,6 @@
     text-align: left;
     flex: 1;
     padding-left: 0;
-    border-radius: 4px;
 
     &:hover {
       text-decoration: underline;
@@ -112,6 +111,7 @@
   }
   .active {
     font-weight: bold;
+    
     &::before {
       content: "‣\00a0";
     }

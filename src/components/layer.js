@@ -92,8 +92,17 @@ export function removeLayer(index=0) {
 }
 
 export function moveLayer(direct=1, index) {
-  if (index >= 0 && index <= layers.value.length - 1 && layers.value[index + (1 * direct)]) {
-    [layers.value[index], layers.value[index + (1 * direct)]] = [layers.value[index + (1 * direct)], layers.value[index]];
+  if (index >= 0 && index <= layers.value.length - 1 && layers.value[index + direct]) {
+    [
+      layers.value[index], 
+      layers.value[index + direct]
+    ] = [
+      layers.value[index + direct], 
+      layers.value[index]
+    ];
+    if (currentLayer.value == index) currentLayer.value += direct;
+    else if (currentLayer.value == index + direct) currentLayer.value = index;
+
     renderTrigger.value += 1;
   }
 }
