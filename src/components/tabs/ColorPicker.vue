@@ -126,6 +126,7 @@
     <div 
       class="cursor"
       :style="{
+        filter: `saturate(${color.a/255})`, 
         left: `${color.alphaX.value}px` 
       }"
     ></div>
@@ -262,14 +263,30 @@
     }
   }
   #hue {
-    background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
     margin-bottom: 12px;
+    cursor: pointer;
+    background:
+      linear-gradient(to right, 
+        red, yellow, lime, cyan, blue, magenta, red
+      ) center / 100% 60% no-repeat,
+      linear-gradient(to bottom,
+        transparent 0%,
+        transparent 100%
+      );
   }
   #alpha {
-    background: linear-gradient(to right, #fff2, #fff);
+    cursor: pointer;
+    background:
+      linear-gradient(to right, 
+        #fff1, lightskyblue
+      ) center / 100% 60% no-repeat,
+      linear-gradient(to bottom,
+        transparent 0%,
+        transparent 100%
+      );
 
     .cursor {
-      background-color: gray;
+      background-color: lightskyblue;
     }
   }
   #palette {
@@ -296,6 +313,7 @@
 
     .color-bg {
       background-image: url('@/assets/other/transparent.png');
+      image-rendering: pixelated;
       background-size: cover;
     }
   }

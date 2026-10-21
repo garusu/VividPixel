@@ -25,8 +25,7 @@
   .block {
     width: 90%;
     height: 50%;
-    padding: 10px 10px;
-    padding-bottom: 0;
+    padding: 12px 10px 0 10px;
     box-sizing: border-box;
     background-color: var(--bar-bg);
     scrollbar-gutter: stable both-edges;

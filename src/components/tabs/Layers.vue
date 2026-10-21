@@ -27,58 +27,56 @@
 </script>
 
 <template>
-  <div id="layers">
-    <div class="sidebar-panel" style="margin-bottom: 5px;">
-      <button 
-        title="Add"
-        class="btn m0"
-        @click="addLayer()"
-      >
-        <img src="@/assets/tools/layer_add.svg">
-      </button>
-      <button 
-        title="Delete"
-        class="btn m0" 
-        :class="{ disable: layerExists }" 
-        @click="removeLayer(currentLayer)"
-      >
-        <img src="@/assets/tools/layer_delete.svg">
-      </button>
-      <button 
-        title="Undo"
-        class="btn m0" 
-        :class="{ disable: undoLayerExists }" 
-        @click="undoLayer()"
-      >
-        <img src="@/assets/tools/layer_undo.svg">
-      </button>
-    </div>
-    <div 
-      v-for="(value, index) in layers"
-      :key="value.id"
-      class="layer"
-      :class="{ active: currentLayer == index }"
+  <div class="sidebar-panel" style="margin-bottom: 5px;">
+    <button 
+      title="Add"
+      class="btn m0"
+      @click="addLayer()"
     >
-      <input 
-        class="title"
-        :value="value.title" 
-        :readonly="isDisabled !== value.id"
-        @click="currentLayer = index"
-        @dblclick="select($event, value)"
-        @blur="rename($event.target.value, value)"
-        @keyup.enter="rename($event.target.value, value)"
-      >
-      <div class="right">
-        <button class="btn" @click="moveLayer(-1, index)">
-          <img src="@/assets/tools/layer_up.svg">
-        </button>
-        <button class="btn" @click="moveLayer(1, index)">
-          <img src="@/assets/tools/layer_down.svg">
-        </button>
-        <button class="btn" @click="hideLayer(index)">
-          <img :src="getImg(value.visible ? 'layer_show.svg' : 'layer_hide.svg')">
-        </button>
-      </div>
+      <img src="@/assets/tools/layer_add.svg">
+    </button>
+    <button 
+      title="Delete"
+      class="btn m0" 
+      :class="{ disable: layerExists }" 
+      @click="removeLayer(currentLayer)"
+    >
+      <img src="@/assets/tools/layer_delete.svg">
+    </button>
+    <button 
+      title="Undo"
+      class="btn m0" 
+      :class="{ disable: undoLayerExists }" 
+      @click="undoLayer()"
+    >
+      <img src="@/assets/tools/layer_undo.svg">
+    </button>
+  </div>
+  <div 
+    v-for="(value, index) in layers"
+    :key="value.id"
+    class="layer"
+    :class="{ active: currentLayer == index }"
+  >
+    <input 
+      class="title"
+      :value="value.title" 
+      :readonly="isDisabled !== value.id"
+      @click="currentLayer = index"
+      @dblclick="select($event, value)"
+      @blur="rename($event.target.value, value)"
+      @keyup.enter="rename($event.target.value, value)"
+    >
+    <div class="right">
+      <button class="btn" @click="moveLayer(-1, index)">
+        <img src="@/assets/tools/layer_up.svg">
+      </button>
+      <button class="btn" @click="moveLayer(1, index)">
+        <img src="@/assets/tools/layer_down.svg">
+      </button>
+      <button class="btn" @click="hideLayer(index)">
+        <img :src="getImg(value.visible ? 'layer_show.svg' : 'layer_hide.svg')">
+      </button>
     </div>
   </div>
 </template>
