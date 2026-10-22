@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed } from 'vue';
+  import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
   import { 
     canvasWidth, 
     canvasHeight, 
@@ -13,6 +13,19 @@
 
   const refWidthInput = ref(null);
 
+  const windowElem = ref(null);
+
+  const x = ref(0);
+  const y = ref(0);
+
+  let dragging = false;
+
+  let startX = 0;
+  let startY = 0;
+
+  let currentX = 0;
+  let currentY = 0;
+
   const ratio = computed(() => {
     const max = Math.max(widthInput.value, heightInput.value);
 
@@ -21,6 +34,44 @@
       height: Math.round(heightInput.value / max * 50) + "%"
     }
   });
+
+  onMounted(() => {
+    const windowRect = windowElem.value.getBoundingClientRect();
+
+    x.value = (window.innerWidth - windowRect.width) / 2;
+    y.value = (window.innerHeight - windowRect.height) / 2;
+  })
+
+  function startDrag(event) {
+    if (event.button == 0 && event.target == event.currentTarget) {
+      dragging = true;
+
+      startX = event.clientX;
+      startY = event.clientY;
+
+      currentX = x.value;
+      currentY = y.value;
+
+      window.addEventListener('pointermove', onDrag);
+      window.addEventListener('pointerup', stopDrag);
+    }
+  }
+
+  function onDrag(event) {
+    if (dragging) {
+      x.value = currentX + event.clientX - startX;
+      y.value = currentY + event.clientY - startY;
+    }
+  }
+
+  function stopDrag() {
+    dragging = false;
+
+    window.removeEventListener('pointermove', onDrag);
+    window.removeEventListener('pointerup', stopDrag);
+  }
+
+  onBeforeUnmount(stopDrag);
 
   function newCanvas(preset=0) {
     if (preset) {
@@ -41,7 +92,15 @@
 
 <template>
   <div id="window" v-if="windowBlock">
-    <div id="block">
+    <div 
+      ref="windowElem"
+      id="block" 
+      :class="{ dragging }"
+      :style="{
+        transform: `translate(${x}px, ${y}px)`
+      }"
+      @pointerdown="startDrag"
+    >
       <div id="preview">
         <div :style="{ width: ratio.width, height: ratio.height }"></div>
       </div>
@@ -78,9 +137,7 @@
 
 <style scoped>
   #window {
-    display: grid;
     position: absolute;
-    place-items: center;
     height: 100%;
     width: 100%;
     background-color: #0008;
