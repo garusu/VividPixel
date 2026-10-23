@@ -12,6 +12,7 @@
   const heightInput = ref(16);
 
   const refWidthInput = ref(null);
+  const refHeightInput = ref(null);
 
   const windowElem = ref(null);
 
@@ -37,6 +38,8 @@
 
   onMounted(() => {
     const windowRect = windowElem.value.getBoundingClientRect();
+
+    refWidthInput.value.focus();
 
     x.value = (window.innerWidth - windowRect.width) / 2;
     y.value = (window.innerHeight - windowRect.height) / 2;
@@ -109,7 +112,8 @@
         <label>
           Width 
           <input 
-            @keyup.enter="refWidthInput.focus()" 
+            ref="refWidthInput"
+            @keyup.enter="refHeightInput.select()" 
             type="text" 
             v-model.number="widthInput"
           >
@@ -117,9 +121,9 @@
         <label>
           Height 
           <input 
-            ref="refWidthInput"
-            @keyup.enter="newCanvas()"  
+            ref="refHeightInput"
             type="text" 
+            @keyup.enter="newCanvas()" 
             v-model.number="heightInput"
           >
         </label>
