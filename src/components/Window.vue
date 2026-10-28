@@ -1,18 +1,10 @@
 <script setup>
-  import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-  import { 
-    canvasWidth, 
-    canvasHeight, 
-    canvasResizeTrigger, 
-    windowBlock, 
-    runErrorMessage
-  } from './store.js';
+  import { ref, shallowRef, onMounted, onBeforeUnmount } from 'vue';
+  import { windowBlock } from './store.js';
 
-  const widthInput = ref(16);
-  const heightInput = ref(16);
+  import Create from './windows/Create.vue';
 
-  const refWidthInput = ref(null);
-  const refHeightInput = ref(null);
+  const currentWindow = shallowRef(Create);
 
   const windowElem = ref(null);
 
@@ -27,23 +19,15 @@
   let currentX = 0;
   let currentY = 0;
 
-  const ratio = computed(() => {
-    const max = Math.max(widthInput.value, heightInput.value);
-
-    return {  
-      width: Math.round(widthInput.value / max * 50) + "%",
-      height: Math.round(heightInput.value / max * 50) + "%"
-    }
-  });
-
   onMounted(() => {
     const windowRect = windowElem.value.getBoundingClientRect();
-
-    refWidthInput.value.focus();
 
     x.value = (window.innerWidth - windowRect.width) / 2;
     y.value = (window.innerHeight - windowRect.height) / 2;
   })
+
+
+  onBeforeUnmount(stopDrag);
 
   function startDrag(event) {
     if (event.button == 0 && event.target == event.currentTarget) {
@@ -73,24 +57,6 @@
     window.removeEventListener('pointermove', onDrag);
     window.removeEventListener('pointerup', stopDrag);
   }
-
-  onBeforeUnmount(stopDrag);
-
-  function newCanvas(preset=0) {
-    if (preset) {
-      canvasHeight.value = preset;
-      canvasWidth.value = preset;
-      canvasResizeTrigger.value += 1;
-      windowBlock.value = false;
-    } else if (widthInput.value < 257 && heightInput.value < 257) {
-      canvasHeight.value = heightInput.value;
-      canvasWidth.value = widthInput.value;
-      canvasResizeTrigger.value += 1;
-      windowBlock.value = false;
-    } else {
-      runErrorMessage.value = "Create";
-    }
-  }
 </script>
 
 <template>
@@ -98,42 +64,18 @@
     <div 
       ref="windowElem"
       id="block" 
-      :class="{ dragging }"
       :style="{
         transform: `translate(${x}px, ${y}px)`
       }"
-      @pointerdown="startDrag"
     >
-      <div id="preview">
-        <div :style="{ width: ratio.width, height: ratio.height }"></div>
-      </div>
-      <div id="settings">
-        <h2>Create Canvas</h2>
-        <label>
-          Width 
-          <input 
-            ref="refWidthInput"
-            @keyup.enter="refHeightInput.select()" 
-            type="text" 
-            v-model.number="widthInput"
-          >
-        </label>
-        <label>
-          Height 
-          <input 
-            ref="refHeightInput"
-            type="text" 
-            @keyup.enter="newCanvas()" 
-            v-model.number="heightInput"
-          >
-        </label>
-        <div id="preset">
-          <p>Preset</p>
-          <button @click="newCanvas(8)">8x8</button>
-          <button @click="newCanvas(16)">16x16</button>
-          <button @click="newCanvas(32)">32x32</button>
+      <div id="titlebar" @pointerdown="startDrag"></div>
+      <div id="main">
+        <div id="tabs">
+          <button class="tab">New Canvas</button>
         </div>
-        <button id="create-btn" @click="newCanvas()">Create</button>
+        <div id="window-block">
+          <component :is="currentWindow" />
+        </div>
       </div>
     </div>
   </div>
@@ -144,89 +86,47 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    background-color: #0008;
+    background-color: #0007;
     z-index: 3;
-
-    #block {
-      display: flex;
-      width: 700px;
-      height: 350px;
-      background-color: var(--bar-bg);
-      padding: 20px;
-      border-radius: 30px;
-      gap: 10px;
-      border: 1px solid var(--bar-dark);
-    }
-    #preview {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      width: 50%;
-      background-color: var(--other);
-      border-radius: 7px;
-      border: 1px solid var(--bar-dark);
-
-      div {
-        width: 50%;
-        height: 50%;
-        background-color: whitesmoke;
-        border-radius: 4px;
-        border: 1px solid grey;
-        transition: width 0.2s ease, height 0.2s ease;
-      }
-    }
-    #settings {
-      display: flex;
-      flex-direction: column;
-      width: 50%;
-      height: 100%;
-    }
-    input {
-      width: 100%;
-      padding: 8px 10px;
-      text-align: left;
-      cursor: text;
-    }
-    h2 {
-      margin: 16px 0;
-      text-align: center;
-    }
-    label, p {
-      display: inline-block;
-      width: 100%;
-      margin: 10px 0;
-    }
-    p {
-      margin-bottom: 0;
-    }
   }
-  button {
-    color: var(--bar-text);
-    background-color: var(--other);
+  #block {
+    width: 750px;
+    background-color: var(--bar-dark);
     border: 1px solid var(--bar-dark);
+  }
+  #titlebar {
+    width: 100%;
+    height: 30px;
+    background-color: var(--bar-dark);
+  }
+  #main {
+    display: flex;
+    width: 100%;
+  }
+  #tabs {
+    flex: 1;
+    padding: 0 5px;
+  }
+  #tabs .tab {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 5px;
     border-radius: 7px;
-    font-size: inherit;
-    padding: 8px 0;
-    min-height: 0;
-    cursor: pointer;
+    box-sizing: border-box;
+    background-color: var(--bar-bg);
+    padding: 10px 5px;
+    align-content: center;
 
     &:hover {
-      background-color: var(--bar-active);
+      background-color: var(--other);
     }
   }
-  #preset {
+  #window-block {
     display: flex;
-    flex-wrap: wrap;
-    column-gap: 10px;
-
-    button {
-      flex: 1;
-    }
-  }
-  #create-btn {
-    width: 100%;
-    margin-top: auto;
-    font-size: 1.17em;
+    flex-direction: column;
+    flex: 4;
+    padding: 10px;
+    background-color: var(--bar-bg);
   }
 </style>
