@@ -11,8 +11,6 @@
   const x = ref(0);
   const y = ref(0);
 
-  let dragging = false;
-
   let startX = 0;
   let startY = 0;
 
@@ -31,8 +29,6 @@
 
   function startDrag(event) {
     if (event.button == 0 && event.target == event.currentTarget) {
-      dragging = true;
-
       startX = event.clientX;
       startY = event.clientY;
 
@@ -45,15 +41,11 @@
   }
 
   function onDrag(event) {
-    if (dragging) {
-      x.value = currentX + event.clientX - startX;
-      y.value = currentY + event.clientY - startY;
-    }
+    x.value = currentX + event.clientX - startX;
+    y.value = currentY + event.clientY - startY;
   }
 
   function stopDrag() {
-    dragging = false;
-
     window.removeEventListener('pointermove', onDrag);
     window.removeEventListener('pointerup', stopDrag);
   }
