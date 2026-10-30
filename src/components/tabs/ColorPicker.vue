@@ -1,10 +1,9 @@
 <script setup>
-  import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+  import { ref, onMounted, onUnmounted } from 'vue';
   import { color } from '../store.js';
+  import Slider from '../slider.vue';
 
-  const hue = ref(null);
   const square = ref(null);
-  const alpha = ref(null);
 
   let dragging = false;
 
@@ -15,13 +14,8 @@
   }
   const mouseUp = () => dragging = false;
 
-  const palette = ref(["#111111", "#DD3333", "#33DD33", "#3333DD", "#BB33DD"]);
-  const selectedTool = ref(0);
-
   onMounted(() => {
     color.square.value = square.value;
-    color.hue.value = hue.value;
-    color.alpha.value = alpha.value;
     document.addEventListener('pointerup', mouseUp);
     document.addEventListener("pointermove", mouseMove);
   });
@@ -29,6 +23,9 @@
     document.removeEventListener('pointerup', mouseUp);
     document.removeEventListener("pointermove", mouseMove);
   });
+
+  const palette = ref(["#111111", "#DD3333", "#33DD33", "#3333DD", "#BB33DD"]);
+  const selectedTool = ref(0);
 
   function mouseMove(event) {
     if (dragging == "square") {
@@ -50,27 +47,6 @@
       color.hsv.s = color.squareX.value / square.value.offsetWidth;
       color.hsv.v = 1 - color.squareY.value / color.square.value.offsetHeight;
 
-    } else if (dragging == "hue") {
-      color.hueX.value = Math.max(
-        0,
-        Math.min(
-          event.clientX - color.hue.value.getBoundingClientRect().left,
-          color.hue.value.offsetWidth
-        )
-      );
-
-      color.hsv.h = color.hueX.value / color.hue.value.offsetWidth * 360;
-
-    } else if (dragging == "alpha") {
-      color.alphaX.value = Math.max(
-        0,
-        Math.min(
-          event.clientX - color.alpha.value.getBoundingClientRect().left,
-          color.alpha.value.offsetWidth
-        )
-      );
-
-      color.a = color.alphaX.value / color.alpha.value.offsetWidth * 255;
     }
   }
 
@@ -103,35 +79,19 @@
       }"
     ></div>
   </div>
-  <div 
-    class="slider" 
-    id="hue"
-    ref="hue"
-    @pointerdown.left="mouseDown('hue', $event)"
-  >
-    <div 
-      class="cursor" 
-      :style="{
-        backgroundColor: color.cssCleanColor, 
-        left: `${color.hueX.value}px` 
-      }"
-    ></div>
-  </div>
-  <div 
-    class="slider"
-    id="alpha"
-    ref="alpha"
-    @pointerdown.left="mouseDown('alpha', $event)"
-  >
-    <div 
-      class="cursor"
-      :style="{
-        filter: `saturate(${color.a/255})`, 
-        left: `${color.alphaX.value}px` 
-      }"
-    ></div>
-  </div>
-
+  <Slider 
+    v-model="color.hsv.h" 
+    :scale="360" 
+    color="linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red)" 
+    :cursor="color.cssCleanColor" 
+    style="margin-bottom: 10px;"
+  />
+  <Slider 
+    v-model="color._alpha.value"
+    :scale="255" 
+    color="linear-gradient(to right, #fff1, lightskyblue)" 
+    cursor="lightskyblue" 
+  />
   <input
     maxlength="9"
     type="text"
@@ -252,41 +212,6 @@
 
     .cursor {
       translate: -50% -50%;
-    }
-  }
-  .slider {
-    width: 100%;
-    height: 14px;
-
-    .cursor {
-      translate: -50% -2px;
-    }
-  }
-  #hue {
-    margin-bottom: 12px;
-    cursor: pointer;
-    background:
-      linear-gradient(to right, 
-        red, yellow, lime, cyan, blue, magenta, red
-      ) center / 100% 60% no-repeat,
-      linear-gradient(to bottom,
-        transparent 0%,
-        transparent 100%
-      );
-  }
-  #alpha {
-    cursor: pointer;
-    background:
-      linear-gradient(to right, 
-        #fff1, lightskyblue
-      ) center / 100% 60% no-repeat,
-      linear-gradient(to bottom,
-        transparent 0%,
-        transparent 100%
-      );
-
-    .cursor {
-      background-color: lightskyblue;
     }
   }
   #palette {

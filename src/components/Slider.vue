@@ -19,10 +19,7 @@
     pos.value = (model.value / props.scale) * slider.value.offsetWidth;
   })
 
-  let sliderRect = 0;
-
-  let startPos = 0;
-  let currentPos = 0;
+  let sliderRect = null;
 
   onMounted(() => {
     nextTick();

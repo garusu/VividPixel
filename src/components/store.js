@@ -124,7 +124,6 @@ class Color {
         value = RgbToHsv(value);
         Object.assign(this.hsv, value);
 
-        this.hueX.value = (value.h / 360) * this.hue.value.offsetWidth;
         this.squareX.value = value.s * this.square.value.offsetWidth;
         this.squareY.value = (1 - value.v) * this.square.value.offsetHeight;
       }
@@ -143,19 +142,13 @@ class Color {
         }
 
         this._alpha.value = value.a;
-        this.alphaX.value = (value.a / 255) * this.alpha.value.offsetWidth;
       }
     })
 
     this.squareX = ref(0);
     this.squareY = ref(183.33);
-    this.hueX = ref(0);
-    this.alphaX = ref(275);
 
-
-    this.hue = ref(null);
     this.square = ref(null);
-    this.alpha = ref(null);
   }
 
   get cssCleanColor() {
