@@ -66,7 +66,9 @@
         transform: `translate(${x}px, ${y}px)`
       }"
     >
-      <div id="titlebar" @pointerdown="startDrag"></div>
+      <div id="titlebar" @pointerdown="startDrag">
+        <button @click="windowBlock = false"><img src="@/assets/tools/close.svg"></button>
+      </div>
       <div id="main">
         <div id="tabs">
           <button 
@@ -102,7 +104,18 @@
   #titlebar {
     width: 100%;
     height: 30px;
+    display: flex;
+    justify-content: end;
     background-color: var(--bar-dark);
+
+    button {
+      all: unset;
+      width: 20px;
+      height: 20px;
+      margin: 3px;
+      padding: 2px;
+      border-radius: 7px;
+    }
   }
   #main {
     display: flex;
