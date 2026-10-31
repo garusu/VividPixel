@@ -18,6 +18,11 @@
   let currentX = 0;
   let currentY = 0;
 
+  const tabs = [
+    { name: "New", tab: Create },
+    { name: "Export", tab: Export},
+  ];
+
   onMounted(() => {
     const windowRect = windowElem.value.getBoundingClientRect();
 
@@ -64,8 +69,14 @@
       <div id="titlebar" @pointerdown="startDrag"></div>
       <div id="main">
         <div id="tabs">
-          <button class="tab" @click="currentWindow = Create">New Canvas</button>
-          <button class="tab" @click="currentWindow = Export">Export</button>
+          <button 
+            v-for="tab in tabs" 
+            class="tab" 
+            :class="{ active: currentWindow == tab.tab  }" 
+            @click="currentWindow = tab.tab"
+          >
+            {{ tab.name }}
+          </button>
         </div>
         <div id="window-block">
           <component :is="currentWindow" />
@@ -115,6 +126,9 @@
     &:hover {
       background-color: var(--other);
     }
+  }
+  #tabs .active {
+    background-color: var(--other);
   }
   #window-block {
     display: flex;
