@@ -22,6 +22,7 @@
     windowBlock,
     canvasResizeTrigger, 
     runErrorMessage,
+    runExport,
     hexToRgba,
     rgbaToHex
   } from './store.js';
@@ -603,6 +604,26 @@
       width: canvasWidth.value / max * 512,
       height: canvasHeight.value / max * 512
     }
+  })
+
+  watch(runExport, (value) => {
+    canvasForExport.width = canvasWidth.value * value.scale;
+    canvasForExport.height = canvasHeight.value * value.scale;
+
+    for (let y = 0; y < canvasHeight.value; y++) {
+      for (let x = 0; x < canvasWidth.value; x++) {
+        const pixel = getPixelColor(x, y);
+
+        for (const p of pixel) {
+          exportCtx.fillStyle = p;
+          exportCtx.fillRect(x*value.scale, y*value.scale, value.scale, value.scale);
+        }
+      }
+    }
+    const link = document.createElement('a');
+    link.download = value.filename.trim() + ".png";
+    link.href = canvasForExport.toDataURL("image/png");
+    link.click();
   })
 
   watch(canvasResizeTrigger, async () => {

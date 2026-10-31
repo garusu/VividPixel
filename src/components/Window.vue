@@ -3,6 +3,7 @@
   import { windowBlock } from './store.js';
 
   import Create from './windows/Create.vue';
+  import Export from './windows/Export.vue';
 
   const currentWindow = shallowRef(Create);
 
@@ -63,7 +64,8 @@
       <div id="titlebar" @pointerdown="startDrag"></div>
       <div id="main">
         <div id="tabs">
-          <button class="tab">New Canvas</button>
+          <button class="tab" @click="currentWindow = Create">New Canvas</button>
+          <button class="tab" @click="currentWindow = Export">Export</button>
         </div>
         <div id="window-block">
           <component :is="currentWindow" />

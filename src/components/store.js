@@ -22,6 +22,11 @@ export const selectedTool = ref(0);
 
 export const runFunc = ref(null);
 export const runErrorMessage = ref(null);
+export const runExport = reactive({
+  id: 0,
+  scale: 1,
+  filename: "Untitled"
+});
 
 export const windowBlock = ref(true);
 

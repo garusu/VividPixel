@@ -1,7 +1,7 @@
 <script setup>
   import { ref, onMounted, onUnmounted } from 'vue';
   import { color } from '../store.js';
-  import Slider from '../slider.vue';
+  import Slider from '../Slider.vue';
 
   const square = ref(null);
 

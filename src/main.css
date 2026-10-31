@@ -67,6 +67,9 @@ input[type="text"] {
 .m0 {
   margin: 0;
 }
+.wf {
+  width: 100%;
+}
 #window {
   input {
     width: 100%;
@@ -100,5 +103,13 @@ input[type="text"] {
     &:hover {
       background-color: var(--bar-active);
     }
+  }
+  #settings {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  #inputs {
+    flex: 1;
   }
 }

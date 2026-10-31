@@ -86,11 +86,6 @@
 </template>
 
 <style scoped>
-  #settings {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
   #preview {
     display: flex;
     justify-content: center;
