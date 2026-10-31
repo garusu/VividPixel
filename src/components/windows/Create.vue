@@ -56,22 +56,26 @@
     </div>
     <div id="inputs">
       <h2>Create Canvas</h2>
-      <label>
+      <label id="width-input">
         Width 
         <input 
           ref="refWidthInput"
           @keyup.enter="refHeightInput.focus()" 
-          type="text" 
           v-model.number="widthInput"
+          type="text" 
+          id="width-input"
+          placeholder="Width"
         >
       </label>
-      <label>
+      <label id="height-input">
         Height 
         <input 
           ref="refHeightInput"
-          type="text" 
           @keyup.enter="newCanvas()" 
           v-model.number="heightInput"
+          type="text" 
+          id="height-input"
+          placeholder="Height"
         >
       </label>
       <div id="preset">

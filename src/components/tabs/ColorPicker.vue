@@ -103,18 +103,21 @@
   <div id="rgb">
     <div class="input-text" data-text="R"><input 
       type="text"
+      id="r"
       :value="color.r" 
       @blur="event => {color.r = event.target.value}"
       @keyup.enter="event => {color.r = event.target.value}"
     ></div>
     <div class="input-text" data-text="G"><input 
       type="text"
+      id="g"
       :value="color.g" 
       @blur="event => {color.g = event.target.value}"
       @keyup.enter="event => {color.g = event.target.value}"
     ></div>
     <div class="input-text" data-text="B"><input 
       type="text"
+      id="b"
       :value="color.b" 
       @blur="event => {color.b = event.target.value}"
       @keyup.enter="event => {color.b = event.target.value}"
