@@ -3,14 +3,14 @@
   import { 
     canvasWidth, 
     canvasHeight,
-    runExport
+    runExport,
+    fileName
   } from '../store.js';
 
   import Slider from '../Slider.vue';
 
   let exportId = 1;
-
-  const fileName = ref("Untitled");
+  
   const scaleFactor = ref(0);
 
   const finalScale = computed(() => {

@@ -12,6 +12,8 @@ export function getImg(name) {
   return images[`/src/assets/tools/${name}`]
 }
 
+export const fileName = ref("Untitled");
+
 export const canvasWidth = ref(16);
 export const canvasHeight = ref(16);
 
@@ -28,7 +30,7 @@ export const runExport = reactive({
   filename: "Untitled"
 });
 
-export const windowBlock = ref(true);
+export const windowBlock = ref("New");
 
 export const menuItems = [
   ["File", 

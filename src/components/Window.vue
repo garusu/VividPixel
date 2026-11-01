@@ -1,11 +1,9 @@
 <script setup>
-  import { ref, shallowRef, onMounted, onBeforeUnmount } from 'vue';
+  import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
   import { windowBlock } from './store.js';
 
   import Create from './windows/Create.vue';
   import Export from './windows/Export.vue';
-
-  const currentWindow = shallowRef(Create);
 
   const windowElem = ref(null);
 
@@ -22,6 +20,10 @@
     { name: "New", tab: Create },
     { name: "Export", tab: Export},
   ];
+
+  const currentWindow = computed(() => {
+    return tabs.find(elem => elem.name == windowBlock.value).tab || null
+  })
 
   onMounted(() => {
     const windowRect = windowElem.value.getBoundingClientRect();
@@ -67,7 +69,7 @@
       }"
     >
       <div id="titlebar" @pointerdown="startDrag">
-        <button @click="windowBlock = false"><img src="@/assets/tools/close.svg"></button>
+        <button @click="windowBlock = null"><img src="@/assets/tools/close.svg"></button>
       </div>
       <div id="main">
         <div id="tabs">
@@ -75,7 +77,7 @@
             v-for="tab in tabs" 
             class="tab" 
             :class="{ active: currentWindow == tab.tab  }" 
-            @click="currentWindow = tab.tab"
+            @click="windowBlock = tab.name"
           >
             {{ tab.name }}
           </button>

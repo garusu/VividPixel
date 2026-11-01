@@ -638,7 +638,7 @@
   watch(runFunc, (value) => {
     switch (value) {
       case "New":
-        windowBlock.value = true;
+        windowBlock.value = "New";
         break;
       case "Save":
         saveJson();
@@ -653,23 +653,7 @@
         openFile(true);
         break;
       case "Export":
-        canvasForExport.width = canvasWidth.value;
-        canvasForExport.height = canvasHeight.value;
-
-        for (let y = 0; y < canvasHeight.value; y++) {
-          for (let x = 0; x < canvasWidth.value; x++) {
-            const pixel = getPixelColor(x, y);
-
-            for (const p of pixel) {
-              exportCtx.fillStyle = p;
-              exportCtx.fillRect(x, y, 1, 1);
-            }
-          }
-        }
-        const link = document.createElement('a');
-        link.download = `${prompt("File Name:")?.trim() || "Untitled"}.png`;
-        link.href = canvasForExport.toDataURL("image/png");
-        link.click();
+        windowBlock.value = "Export";
         break;
       case "Reset":
         resetLayers();

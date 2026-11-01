@@ -32,12 +32,12 @@
       canvasHeight.value = preset;
       canvasWidth.value = preset;
       canvasResizeTrigger.value += 1;
-      windowBlock.value = false;
+      windowBlock.value = null;
     } else if (widthInput.value < 257 && heightInput.value < 257) {
       canvasHeight.value = heightInput.value;
       canvasWidth.value = widthInput.value;
       canvasResizeTrigger.value += 1;
-      windowBlock.value = false;
+      windowBlock.value = null;
     } else {
       runErrorMessage.value = "Create";
     }
