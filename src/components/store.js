@@ -27,7 +27,10 @@ export const runErrorMessage = ref(null);
 export const runExport = reactive({
   id: 0,
   scale: 1,
-  filename: "Untitled"
+  filename: "Untitled",
+  format: "image/png",
+  target: [null, null],
+  download: true
 });
 
 export const windowBlock = ref("New");

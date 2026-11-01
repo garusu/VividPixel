@@ -42,7 +42,7 @@
   let previewCtx;
 
   const canvasForExport = document.createElement("canvas");
-  let exportCtx = canvasForExport.getContext("2d");
+  const exportCtx = canvasForExport.getContext("2d");
 
   let prevPix;
   const filledPrevPix = new Set();
@@ -323,6 +323,22 @@
     } else {
       previewCtx.fillStyle = color.hex;
       previewCtx.fillRect(x, y, 1, 1);
+    }
+  }
+
+  function finalRender(target, scale) {
+    target[0].width = canvasWidth.value * scale;
+    target[0].height = canvasHeight.value * scale;
+
+    for (let y = 0; y < canvasHeight.value; y++) {
+      for (let x = 0; x < canvasWidth.value; x++) {
+        const pixel = getPixelColor(x, y);
+
+        for (const p of pixel) {
+          target[1].fillStyle = p;
+          target[1].fillRect(x*scale, y*scale, scale, scale);
+        }
+      }
     }
   }
 
@@ -607,23 +623,17 @@
   })
 
   watch(runExport, (value) => {
-    canvasForExport.width = canvasWidth.value * value.scale;
-    canvasForExport.height = canvasHeight.value * value.scale;
-
-    for (let y = 0; y < canvasHeight.value; y++) {
-      for (let x = 0; x < canvasWidth.value; x++) {
-        const pixel = getPixelColor(x, y);
-
-        for (const p of pixel) {
-          exportCtx.fillStyle = p;
-          exportCtx.fillRect(x*value.scale, y*value.scale, value.scale, value.scale);
-        }
-      }
+    finalRender(
+      !value.target[0] || !value.target[1] ? [canvasForExport, exportCtx] : value.target, 
+      value.scale
+    );
+    
+    if (value.download) {
+      const link = document.createElement('a');
+      link.download = (value.filename.trim() || "Untitled") + ".png";
+      link.href = canvasForExport.toDataURL(value.format);
+      link.click();
     }
-    const link = document.createElement('a');
-    link.download = value.filename.trim() + ".png";
-    link.href = canvasForExport.toDataURL("image/png");
-    link.click();
   })
 
   watch(canvasResizeTrigger, async () => {
