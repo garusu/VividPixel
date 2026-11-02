@@ -630,7 +630,9 @@
     
     if (value.download) {
       const link = document.createElement('a');
-      link.download = (value.filename.trim() || "Untitled") + ".png";
+      link.download = (
+        value.filename.trim() || "Untitled"
+      ) + `.${value.format}`.replace("image/", "");
       link.href = canvasForExport.toDataURL(value.format);
       link.click();
     }

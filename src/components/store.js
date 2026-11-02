@@ -13,6 +13,7 @@ export function getImg(name) {
 }
 
 export const fileName = ref("Untitled");
+export const fileFormat = ref("image/png");
 
 export const canvasWidth = ref(16);
 export const canvasHeight = ref(16);
@@ -25,7 +26,6 @@ export const selectedTool = ref(0);
 export const runFunc = ref(null);
 export const runErrorMessage = ref(null);
 export const runExport = reactive({
-  id: 0,
   scale: 1,
   filename: "Untitled",
   format: "image/png",

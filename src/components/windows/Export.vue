@@ -4,12 +4,11 @@
     canvasWidth, 
     canvasHeight,
     runExport,
-    fileName
+    fileName,
+    fileFormat
   } from '../store.js';
 
   import Slider from '../Slider.vue';
-
-  let exportId = 1;
 
   const previewExportCanvas = ref(null);
   let previewExportCtx;
@@ -30,14 +29,13 @@
     Object.assign(
       runExport, 
       { 
-        id: exportId, 
         scale: scale, 
-        filename: fileName,
+        filename: fileName.value,
+        format: fileFormat.value,
         target: [target, ctx],
         download: download
       }
     )
-    exportId += 1;
   }
 </script>
 
@@ -61,6 +59,13 @@
           placeholder="Filename"
         >
       </label>
+      <label id="filename-input">
+        Format
+        <select id="select" v-model="fileFormat">
+          <option value="image/png">PNG</option>
+          <option value="image/jpeg">JPEG</option>
+        </select>
+      </label>
       <p id="slider-input">Scale Factor: x{{ finalScale }}</p>
       <div style="padding: 3px 10px;">
         <Slider v-model="scaleFactor" :scale="15" />
@@ -75,6 +80,17 @@
   canvas {
     width: 100%;
     height: 100%;
+  }
+  select {
+    width: 100%;
+    padding: 8px 10px;
+    padding-left: 6px;
+    font-size: inherit;
+    color: inherit;
+    background-color: var(--other);
+    border: 1px solid var(--bar-dark);
+    border-radius: 7px;
+    cursor: pointer;
   }
   #slider-input {
     margin: 5px 0;

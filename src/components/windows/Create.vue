@@ -111,9 +111,6 @@
     column-gap: 5px;
     margin-top: 4px;
 
-    p {
-      width: 100%;
-    }
     button {
       flex: 1;
     }
