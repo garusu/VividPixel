@@ -210,8 +210,8 @@
     const pos = getPos(event);
 
     if (action == "line") {
-      clearPrev();
       drawLine(last.x, last.y, pos.x, pos.y, color.hex);
+      clearPrev();
     } else if (action == "square") {
       drawSquare(last.x, last.y, pos.x, pos.y, color.hex);
       clearPrev();

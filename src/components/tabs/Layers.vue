@@ -60,7 +60,7 @@
   >
     <input 
       class="title"
-      id="title"
+      :id="value.id"
       :value="value.title" 
       :readonly="isDisabled !== value.id"
       @click="currentLayer = index"
