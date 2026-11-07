@@ -60,7 +60,11 @@
 </script>
 
 <template>
-  <div id="window" v-if="windowBlock">
+  <div 
+    id="window" 
+    @keydown.esc="windowBlock = null" 
+    v-if="windowBlock"
+  >
     <div 
       ref="windowElem"
       id="block" 
@@ -69,7 +73,12 @@
       }"
     >
       <div id="titlebar" @pointerdown="startDrag">
-        <button @click="windowBlock = null"><img src="@/assets/tools/close.svg"></button>
+        <button 
+          title="Close" 
+          @click="windowBlock = null"
+        >
+          <img src="@/assets/tools/close.svg">
+        </button>
       </div>
       <div id="main">
         <div id="tabs">
