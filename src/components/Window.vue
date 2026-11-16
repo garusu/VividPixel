@@ -111,6 +111,7 @@
     width: 750px;
     background-color: var(--bar-dark);
     border: 1px solid var(--bar-dark);
+    border-radius: 4px;
   }
   #titlebar {
     width: 100%;
@@ -159,6 +160,7 @@
     flex-direction: column;
     flex: 4;
     padding: 10px;
+    border-bottom-right-radius: 3px;
     background-color: var(--bar-bg);
   }
 </style>
