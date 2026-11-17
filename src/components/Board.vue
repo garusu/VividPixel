@@ -49,13 +49,22 @@
 
   const canvasPos = reactive({
     x: 400,
-    y: 200
+    y: -200
   });
 
   let offset = [0, 0];
 
+  const selection = reactive({
+    x: 0, 
+    y: 0, 
+    w: -1, 
+    h: -1
+  });
+
   const canvasScale = ref(1);
 
+
+  const originalScale = 512;
   const minCanvasScale = 0.2;
   const maxCanvasScale = 2;
 
@@ -81,6 +90,12 @@
 
   function setPixel(x, y, color, prev=false) {
     if (x < 0 || y < 0 || x >= canvasWidth.value || y >= canvasHeight.value) return;
+    if ( selection.w != -1 && selection.h != -1 && (
+      x < selection.x || 
+      y < selection.y || 
+      x > selection.x+selection.w || 
+      y > selection.y+selection.h
+    )) return;
     if (layers.value.length !== 0) {
       if (prev) {
         const index = y * canvasWidth.value + x;
@@ -150,13 +165,16 @@
           action = "draw";
           setPixel(last.x, last.y, current_color);
           break;
-        case 3: // Line
+        case 3: // Select
+          action = "select";
+          break;
+        case 4: // Line
           action = "line";
           break;
-        case 4: // Rectangle
+        case 5: // Rectangle
           action = "square";
           break;
-        case 5: // Ellipse
+        case 6: // Ellipse
           action = "ellipse";
           break;
         case 2: // Eyedropper
@@ -168,7 +186,7 @@
           ).at(-1) || color.hex;
           if (!transperent.includes(eyedropper)) color.hex = eyedropper;
           break;
-        case 6: // Drag
+        case 7: // Drag
           action = "drag";
           offset = [
             event.clientX - canvasPos.x,
@@ -203,6 +221,8 @@
       drawSquare(last.x, last.y, pos.x, pos.y, "#0000", true);
     } else if (action == "ellipse") {
       drawEllipse(last.x, last.y, pos.x, pos.y, "#0000", true);
+    } else if (action == "select") {
+      setSelection(last.x, last.y, pos.x, pos.y);
     }
   }
 
@@ -340,6 +360,24 @@
         }
       }
     }
+  }
+
+  function setSelection(x0, y0, x1, y1) {
+    const x = Math.min(x0, x1);
+    const y = Math.min(y0, y1);
+    const maxX = Math.max(x0, x1);
+    const maxY = Math.max(y0, y1);
+
+    if (x < 0 || y < 0 || maxX >= canvasWidth.value || maxY >= canvasHeight.value) return;
+
+    const w = Math.abs(x0 - x1);
+    const h = Math.abs(y0 - y1);
+
+    Object.assign(selection, { x, y, w, h });
+  }
+
+  function clearSelection() {
+    Object.assign(selection, { x: 0, y: 0, w: -1, h: -1 });
   }
 
   function drawLine(x0, y0, x1, y1, color, prev=false) {
@@ -617,9 +655,16 @@
     const max = Math.max(canvasWidth.value, canvasHeight.value);
 
     return {  
-      width: canvasWidth.value / max * 512,
-      height: canvasHeight.value / max * 512
+      width: canvasWidth.value / max * originalScale,
+      height: canvasHeight.value / max * originalScale
     }
+  })
+
+  const pixelSize = computed(() => {
+    return {  
+      width: originalScale / canvasHeight.value,
+      height: originalScale / canvasHeight.value
+    } 
   })
 
   watch(runExport, (value) => {
@@ -640,6 +685,7 @@
 
   watch(canvasResizeTrigger, async () => {
     await nextTick();
+    clearSelection();
     prepareСanvas();
   })
 
@@ -704,32 +750,39 @@
     @contextmenu.prevent
   >
     <Toolbar />
-    <canvas 
-      ref="previewCanvas"
-      id="preview" 
-      :width="canvasWidth" 
-      :height="canvasHeight" 
+    <div 
+      id="box"
       :style="{
-        left: canvasPos.x + 'px', 
-        top: canvasPos.y + 'px', 
+        transform: `translate(${canvasPos.x}px, ${canvasPos.y}px) scale(${canvasScale})`,
         width: ratio.width + 'px',
-        height: ratio.height + 'px',
-        scale: canvasScale
+        height: ratio.height + 'px'
       }"
-    ></canvas>
-    <canvas 
-      ref="canvas" 
-      id="canvas" 
-      :width="canvasWidth" 
-      :height="canvasHeight" 
-      :style="{
-        left: canvasPos.x + 'px', 
-        top: canvasPos.y + 'px', 
-        width: ratio.width + 'px',
-        height: ratio.height + 'px',
-        scale: canvasScale
-      }"
-    ></canvas>
+    >
+      <svg>
+        <rect
+          :x="selection.x*pixelSize.width"
+          :y="selection.y*pixelSize.height"
+          :width="(selection.w+1)*pixelSize.width"
+          :height="(selection.h+1)*pixelSize.height"
+          fill="none"
+          stroke="blue"
+          stroke-width="2"
+          stroke-dasharray="16"
+        />
+      </svg>
+      <canvas 
+        ref="previewCanvas"
+        id="preview" 
+        :width="canvasWidth" 
+        :height="canvasHeight" 
+      ></canvas>
+      <canvas 
+        ref="canvas" 
+        id="canvas" 
+        :width="canvasWidth" 
+        :height="canvasHeight" 
+      ></canvas>
+  </div>
   </div>
 </template>
 
@@ -737,11 +790,23 @@
   canvas {
     image-rendering: pixelated;
     position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  svg {
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  #box {
+    position: relative;
     z-index: -1;
   }
   #preview {
-    pointer-events: none;
     z-index: 1;
+    pointer-events: none;
   }
   #board {
     position: relative;

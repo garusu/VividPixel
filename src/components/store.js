@@ -78,6 +78,7 @@ export const tools = [
   (new Tool("Eraser", "eraser.svg", "E")),
   (new Tool("Eyedropper", "picker.svg", "I"))
     .setFlags("Layer Only", true),
+  (new Tool("Select", "select.svg", "S")),
   (new Tool("Line", "line.svg", "L"))
     .setFlags("Perpendicular", false),
   (new Tool("Rectangle", "square.svg", "R"))
