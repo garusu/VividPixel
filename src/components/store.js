@@ -53,6 +53,9 @@ export const menuItems = [
     ["Undo", "Ctrl + Z"],
     ["Redo", "Shift + Ctrl + Z"]
   ],
+  ["Select", 
+    ["Deselect", "Ctrl + D"]
+  ],
   ["View", 
     ["Zoom Out", "Ctrl + Subtract"], 
     ["Zoom In", "Ctrl + Add"]

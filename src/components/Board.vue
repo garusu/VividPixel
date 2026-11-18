@@ -730,6 +730,9 @@
         layers.value[currentLayer.value].redo()
         render();
         break;
+      case "Deselect":
+        clearSelection();
+        break;
       case "Zoom Out":
         canvasScale.value = Math.max(canvasScale.value - 0.2, minCanvasScale);
         break;
