@@ -58,11 +58,14 @@
     x: 0, 
     y: 0, 
     w: -1, 
-    h: -1
+    h: -1,
+    oldX: 0,
+    oldY: 0,
+    data: []
   });
+  const inSelect = ref(false);
 
   const canvasScale = ref(1);
-
 
   const originalScale = 512;
   const minCanvasScale = 0.2;
@@ -97,15 +100,15 @@
       y > selection.y+selection.h
     )) return;
     if (layers.value.length !== 0) {
-      if (prev) {
-        const index = y * canvasWidth.value + x;
+      const index = y * canvasWidth.value + x;
 
+      if (prev) {
         filledPrevPix.add(index);
         prevPix[index] = true;
 
         previewRender(x, y);
-      } else if (layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] != color) {
-        layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] = color;
+      } else if (layers.value[currentLayer.value].pixels[index] != color) {
+        layers.value[currentLayer.value].pixels[index] = color;
 
         softRender(x, y);
       }
@@ -166,7 +169,15 @@
           setPixel(last.x, last.y, current_color);
           break;
         case 3: // Select
-          action = "select";
+          if (inSelect.value) {
+            pasteSelection(true);
+            cutSelection();
+            selection.oldX = selection.x;
+            selection.oldY = selection.y;
+            action = "moveSelection";
+          } else {
+            action = "select";
+          }
           break;
         case 4: // Line
           action = "line";
@@ -208,6 +219,7 @@
   }
 
   function mouseMove(event) {
+    if (!action) return;
     const pos = getPos(event);
     if (action == "draw") {
       drawLine(last.x, last.y, pos.x, pos.y, current_color)
@@ -223,6 +235,8 @@
       drawEllipse(last.x, last.y, pos.x, pos.y, "#0000", true);
     } else if (action == "select") {
       setSelection(last.x, last.y, pos.x, pos.y);
+    } else if (action == "moveSelection") {
+      moveSelection(last.x, last.y, pos.x, pos.y);
     }
   }
 
@@ -237,6 +251,9 @@
       clearPrev();
     } else if (action == "ellipse") {
       drawEllipse(last.x, last.y, pos.x, pos.y, color.hex);
+      clearPrev();
+    } else if (action == "moveSelection") {
+      pasteSelection();
       clearPrev();
     }
 
@@ -341,7 +358,7 @@
     if (prevPix[y * canvasWidth.value + x] === null) {
       previewCtx.clearRect(x, y, 1, 1);
     } else {
-      previewCtx.fillStyle = color.hex;
+      previewCtx.fillStyle = action == "moveSelection" ? "#00F8" : color.hex;
       previewCtx.fillRect(x, y, 1, 1);
     }
   }
@@ -376,8 +393,40 @@
     Object.assign(selection, { x, y, w, h });
   }
 
-  function clearSelection() {
-    Object.assign(selection, { x: 0, y: 0, w: -1, h: -1 });
+  function moveSelection(x0, y0, x1, y1) {
+    const dx = x1 - x0
+    const dy = y1 - y0
+
+    Object.assign(selection, { x: selection.oldX+dx, y: selection.oldY+dy })
+
+    clearPrev();
+    pasteSelection(true);
+  }
+
+  function cutSelection() {
+    selection.data = [];
+
+    for (let y = selection.y; y <= selection.y+selection.h; y++) {
+      for (let x = selection.x; x <= selection.x+selection.w; x++) {
+        selection.data.push( layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || "#0000" );
+        setPixel(x, y, "#0000");
+      }
+    }
+  }
+
+  function pasteSelection(prev=false) {
+    let i = 0;
+
+    for (let y = selection.y; y <= selection.y+selection.h; y++) {
+      for (let x = selection.x; x <= selection.x+selection.w; x++) {
+        if (!transperent.includes(selection.data[i])) setPixel(x, y, selection.data[i], prev);
+        i++;
+      }
+    }
+  }
+
+  function deselect() {
+    Object.assign(selection, { x: 0, y: 0, w: -1, h: -1, data: [] });
   }
 
   function drawLine(x0, y0, x1, y1, color, prev=false) {
@@ -685,7 +734,7 @@
 
   watch(canvasResizeTrigger, async () => {
     await nextTick();
-    clearSelection();
+    deselect();
     prepareСanvas();
   })
 
@@ -731,7 +780,7 @@
         render();
         break;
       case "Deselect":
-        clearSelection();
+        deselect();
         break;
       case "Zoom Out":
         canvasScale.value = Math.max(canvasScale.value - 0.2, minCanvasScale);
@@ -763,10 +812,13 @@
     >
       <svg>
         <rect
+          @mouseenter="inSelect = true"
+          @mouseleave="inSelect = false"
           :x="selection.x*pixelSize.width"
           :y="selection.y*pixelSize.height"
           :width="(selection.w+1)*pixelSize.width"
           :height="(selection.h+1)*pixelSize.height"
+          :class="{ move: selectedTool == 3 }"
           fill="transparent"
           stroke="blue"
           stroke-width="2"
@@ -801,6 +853,9 @@
     z-index: 2;
     width: 100%;
     height: 100%;
+  }
+  .move:hover {
+    cursor: move;
   }
   #preview {
     z-index: 1;

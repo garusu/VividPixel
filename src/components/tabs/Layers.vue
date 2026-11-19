@@ -105,6 +105,9 @@
       text-decoration: underline;
     }
   }
+  .title[readonly] {
+    caret-color: transparent;
+  }
   .right {
     height: 25px;
   }
