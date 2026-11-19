@@ -20,10 +20,12 @@
 <style scoped>
   #toolbar {
     display: inline-flex;
+    position: relative;
     flex-direction: column;
     overflow: hidden;
     margin: 7px;
     border-radius: 10px;
+    z-index: 1;
   }
   .tool {
     width: 50px;

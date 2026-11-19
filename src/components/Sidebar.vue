@@ -29,5 +29,6 @@
     width: 350px;
     flex-wrap: wrap;
     height: 100%;
+    z-index: 1;
   }
 </style>

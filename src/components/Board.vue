@@ -767,7 +767,7 @@
           :y="selection.y*pixelSize.height"
           :width="(selection.w+1)*pixelSize.width"
           :height="(selection.h+1)*pixelSize.height"
-          fill="none"
+          fill="transparent"
           stroke="blue"
           stroke-width="2"
           stroke-dasharray="16"
@@ -801,11 +801,6 @@
     z-index: 2;
     width: 100%;
     height: 100%;
-    pointer-events: none;
-  }
-  #box {
-    position: relative;
-    z-index: -1;
   }
   #preview {
     z-index: 1;

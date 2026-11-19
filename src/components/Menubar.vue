@@ -50,6 +50,7 @@
   #menubar {
     display: flex;
     background-color: var(--bar-bg);
+    z-index: 2;
   }
   .menu-btn {
     position: relative;
