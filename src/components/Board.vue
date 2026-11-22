@@ -58,9 +58,9 @@
     x: 0, 
     y: 0, 
     w: -1, 
-    h: -1,
-    oldX: 0,
-    oldY: 0,
+    h: -1, 
+    oldX: 0, 
+    oldY: 0, 
     data: []
   });
   const inSelect = ref(false);
@@ -73,6 +73,7 @@
 
   let action = null;
   let last = null;
+  let lastPos = {x: -1, y: -1};
 
   let current_color = "#000";
   let color2 = "#0000";
@@ -189,7 +190,12 @@
           action = "ellipse";
           break;
         case 2: // Eyedropper
-          if (last.x < 0 || last.y < 0 || last.x >= canvasWidth.value || last.y >= canvasHeight.value) return;
+          if (
+            last.x < 0 || 
+            last.y < 0 || 
+            last.x >= canvasWidth.value || 
+            last.y >= canvasHeight.value
+          ) return;
           const eyedropper = getPixelColor(
             last.x, 
             last.y, 
@@ -221,22 +227,34 @@
   function mouseMove(event) {
     if (!action) return;
     const pos = getPos(event);
-    if (action == "draw") {
-      drawLine(last.x, last.y, pos.x, pos.y, current_color)
-      last = pos;
-    } else if (action == "drag") {
+
+    if (pos.x != lastPos.x || pos.y != lastPos.y) {
+      switch (action) {
+        case "draw":
+          drawLine(last.x, last.y, pos.x, pos.y, current_color);
+          last = pos;
+          break;
+        case "line":
+          drawLine(last.x, last.y, pos.x, pos.y, "#0000", true);
+          break;
+        case "square":
+          drawSquare(last.x, last.y, pos.x, pos.y, "#0000", true);
+          break;
+        case "ellipse":
+          drawEllipse(last.x, last.y, pos.x, pos.y, "#0000", true);
+          break;
+        case "select":
+          setSelection(last.x, last.y, pos.x, pos.y);
+          break;
+        case "moveSelection":
+          moveSelection(last.x, last.y, pos.x, pos.y);
+          break;
+      }
+      lastPos = pos;
+    }
+    if (action == "drag") {
       canvasPos.x = event.clientX - offset[0];
       canvasPos.y = event.clientY - offset[1];
-    } else if (action == "line") {
-      drawLine(last.x, last.y, pos.x, pos.y, "#0000", true);
-    } else if (action == "square") {
-      drawSquare(last.x, last.y, pos.x, pos.y, "#0000", true);
-    } else if (action == "ellipse") {
-      drawEllipse(last.x, last.y, pos.x, pos.y, "#0000", true);
-    } else if (action == "select") {
-      setSelection(last.x, last.y, pos.x, pos.y);
-    } else if (action == "moveSelection") {
-      moveSelection(last.x, last.y, pos.x, pos.y);
     }
   }
 
@@ -394,10 +412,10 @@
   }
 
   function moveSelection(x0, y0, x1, y1) {
-    const dx = x1 - x0
-    const dy = y1 - y0
+    const dx = x1 - x0;
+    const dy = y1 - y0;
 
-    Object.assign(selection, { x: selection.oldX+dx, y: selection.oldY+dy })
+    Object.assign(selection, { x: selection.oldX+dx, y: selection.oldY+dy });
 
     clearPrev();
     pasteSelection(true);
@@ -408,7 +426,10 @@
 
     for (let y = selection.y; y <= selection.y+selection.h; y++) {
       for (let x = selection.x; x <= selection.x+selection.w; x++) {
-        selection.data.push( layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || "#0000" );
+        selection.data.push( 
+          layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
+          "#0000" 
+        );
         setPixel(x, y, "#0000");
       }
     }
