@@ -289,6 +289,14 @@
     };
   }
 
+  function getPixels(startX, startY, maxX, maxY, data) {
+    for (let y = startY; y <= maxY; y++) {
+      for (let x = startX; x <= maxX; x++) {
+        data(x, y);
+      }
+    }
+  }
+
   function opacity(hex) {
     const hexa = hex.substring(7, 9);
 
@@ -346,11 +354,9 @@
   }
 
   function render() {
-    for (let y = 0; y < canvasHeight.value; y++) {
-      for (let x = 0; x < canvasWidth.value; x++) {
-        softRender(x, y);
-      }
-    }
+    getPixels(0, 0, canvasWidth.value-1, canvasHeight.value-1, (x, y) => {
+      softRender(x, y);
+    });
   }
 
   function softRender(x, y) {
@@ -385,16 +391,14 @@
     target[0].width = canvasWidth.value * scale;
     target[0].height = canvasHeight.value * scale;
 
-    for (let y = 0; y < canvasHeight.value; y++) {
-      for (let x = 0; x < canvasWidth.value; x++) {
-        const pixel = getPixelColor(x, y);
+    getPixels(0, 0, canvasWidth.value-1, canvasHeight.value-1, (x, y) => {
+      const pixel = getPixelColor(x, y);
 
-        for (const p of pixel) {
-          target[1].fillStyle = p;
-          target[1].fillRect(x*scale, y*scale, scale, scale);
-        }
+      for (const p of pixel) {
+        target[1].fillStyle = p;
+        target[1].fillRect(x*scale, y*scale, scale, scale);
       }
-    }
+    });
   }
 
   function setSelection(x0, y0, x1, y1) {
@@ -424,26 +428,22 @@
   function cutSelection() {
     selection.data = [];
 
-    for (let y = selection.y; y <= selection.y+selection.h; y++) {
-      for (let x = selection.x; x <= selection.x+selection.w; x++) {
-        selection.data.push( 
-          layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
-          "#0000" 
-        );
-        setPixel(x, y, "#0000");
-      }
-    }
+    getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
+      selection.data.push( 
+        layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
+        "#0000" 
+      );
+      setPixel(x, y, "#0000");
+    });
   }
 
   function pasteSelection(prev=false) {
     let i = 0;
 
-    for (let y = selection.y; y <= selection.y+selection.h; y++) {
-      for (let x = selection.x; x <= selection.x+selection.w; x++) {
-        if (!transperent.includes(selection.data[i])) setPixel(x, y, selection.data[i], prev);
-        i++;
-      }
-    }
+    getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
+      if (!transperent.includes(selection.data[i])) setPixel(x, y, selection.data[i], prev);
+      i++;
+    });
   }
 
   function deselect() {
@@ -590,13 +590,10 @@
       endX = Math.max(x0, x1);
       endY = Math.max(y0, y1);
     }
-
-    for (let y = startY; y <= endY; y++) {
-      for (let x = startX; x <= endX; x++) {
-        if (fill) setPixel(x, y, color, prev);
-        else if (x == startX || x == endX || y == startY || y == endY) setPixel(x, y, color, prev);
-      }
-    }
+    getPixels(startX, startY, endX, endY, (x, y) => {
+      if (fill) setPixel(x, y, color, prev);
+      else if (x == startX || x == endX || y == startY || y == endY) setPixel(x, y, color, prev);
+    });
   }
 
   async function saveJson() {
