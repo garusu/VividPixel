@@ -76,6 +76,7 @@
         <button 
           title="Close" 
           @click="windowBlock = null"
+          style="cursor: pointer;" 
         >
           <img src="@/assets/tools/close.svg">
         </button>
@@ -119,6 +120,11 @@
     display: flex;
     justify-content: end;
     background-color: var(--bar-dark);
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
 
     button {
       all: unset;
