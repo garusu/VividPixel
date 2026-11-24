@@ -61,7 +61,8 @@
     h: -1, 
     oldX: 0, 
     oldY: 0, 
-    data: []
+    data: [],
+    inMove: false
   });
   const inSelect = ref(false);
 
@@ -171,8 +172,11 @@
           break;
         case 3: // Select
           if (inSelect.value) {
-            pasteSelection(true);
-            cutSelection();
+            if (!selection.inMove) {
+              cutSelection();
+              pasteSelection(true);
+              selection.inMove = true;
+            }
             selection.oldX = selection.x;
             selection.oldY = selection.y;
             action = "moveSelection";
@@ -269,9 +273,6 @@
       clearPrev();
     } else if (action == "ellipse") {
       drawEllipse(last.x, last.y, pos.x, pos.y, color.hex);
-      clearPrev();
-    } else if (action == "moveSelection") {
-      pasteSelection();
       clearPrev();
     }
 
@@ -412,7 +413,7 @@
     const w = Math.abs(x0 - x1);
     const h = Math.abs(y0 - y1);
 
-    Object.assign(selection, { x, y, w, h });
+    Object.assign(selection, { x, y, w, h, inMove: false });
   }
 
   function moveSelection(x0, y0, x1, y1) {
@@ -734,6 +735,14 @@
     } 
   })
 
+  watch(selectedTool, (value) => {
+    if (selection.inMove && value != 3) {
+      clearPrev();
+      pasteSelection();
+      deselect();   
+    }
+  });
+
   watch(runExport, (value) => {
     finalRender(
       !value.target[0] || !value.target[1] ? [canvasForExport, exportCtx] : value.target, 
@@ -748,17 +757,17 @@
       link.href = canvasForExport.toDataURL(value.format);
       link.click();
     }
-  })
+  });
 
   watch(canvasResizeTrigger, async () => {
     await nextTick();
     deselect();
     prepareСanvas();
-  })
+  });
 
   watch(renderTrigger, (value) => {
     render();
-  })
+  });
 
   watch(runFunc, (value) => {
     switch (value) {
@@ -800,6 +809,13 @@
       case "Deselect":
         deselect();
         break;
+      case "Apply Transform":
+        if (selection.w != -1 && selection.h != -1) {
+          clearPrev();
+          pasteSelection();
+          deselect();
+        }
+        break;
       case "Zoom Out":
         canvasScale.value = Math.max(canvasScale.value - 0.2, minCanvasScale);
         break;
@@ -808,7 +824,7 @@
         break;
     }
     runFunc.value = null;
-  })
+  });
 </script>
 
 <template>
