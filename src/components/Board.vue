@@ -174,7 +174,7 @@
           if (inSelect.value) {
             if (!selection.inMove) {
               cutSelection();
-              pasteSelection(true);
+              placeSelection(true);
               selection.inMove = true;
             }
             selection.oldX = selection.x;
@@ -423,7 +423,7 @@
     Object.assign(selection, { x: selection.oldX+dx, y: selection.oldY+dy });
 
     clearPrev();
-    pasteSelection(true);
+    placeSelection(true);
   }
 
   function cutSelection() {
@@ -438,7 +438,7 @@
     });
   }
 
-  function pasteSelection(prev=false) {
+  function placeSelection(prev=false) {
     let i = 0;
 
     getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
@@ -738,7 +738,7 @@
   watch(selectedTool, (value) => {
     if (selection.inMove && value != 3) {
       clearPrev();
-      pasteSelection();
+      placeSelection();
       deselect();   
     }
   });
@@ -812,7 +812,7 @@
       case "Apply Transform":
         if (selection.w != -1 && selection.h != -1) {
           clearPrev();
-          pasteSelection();
+          placeSelection();
           deselect();
         }
         break;
