@@ -55,7 +55,9 @@ export const menuItems = [
   ],
   ["Select", 
     ["Deselect", "Ctrl + D"],
-    ["Apply Transform", "Enter"]
+    ["Apply Transform", "Enter"],
+    ["Copy", "Ctrl + C"],
+    ["Paste", "Ctrl + V"]
   ],
   ["View", 
     ["Zoom Out", "Ctrl + Subtract"], 

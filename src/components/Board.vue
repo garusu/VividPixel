@@ -64,6 +64,13 @@
     data: [],
     inMove: false
   });
+  const saveSelection = {
+    x: 0,
+    y: 0,
+    w: -1,
+    h: -1,
+    data: []
+  };
   const inSelect = ref(false);
 
   const canvasScale = ref(1);
@@ -74,7 +81,8 @@
 
   let action = null;
   let last = null;
-  let lastPos = {x: -1, y: -1};
+  let pos = { x: 0, y: 0 };
+  let lastPos = { x: -1, y: -1 };
 
   let current_color = "#000";
   let color2 = "#0000";
@@ -229,8 +237,9 @@
   }
 
   function mouseMove(event) {
+    pos = getPos(event);
+
     if (!action) return;
-    const pos = getPos(event);
 
     if (pos.x != lastPos.x || pos.y != lastPos.y) {
       switch (action) {
@@ -276,9 +285,9 @@
       clearPrev();
     }
 
-    action = null;
+    if (action != "moveSelection") historyUpdate();
 
-    historyUpdate();
+    action = null;
   }
 
   function getPos(event) {
@@ -402,18 +411,22 @@
     });
   }
 
-  function setSelection(x0, y0, x1, y1) {
+  function setSelection(x0, y0, x1, y1, data=[], limit=true, inMove=false) {
     const x = Math.min(x0, x1);
     const y = Math.min(y0, y1);
     const maxX = Math.max(x0, x1);
     const maxY = Math.max(y0, y1);
 
-    if (x < 0 || y < 0 || maxX >= canvasWidth.value || maxY >= canvasHeight.value) return;
+    if (limit && (x < 0 || y < 0 || maxX >= canvasWidth.value || maxY >= canvasHeight.value)) return;
+    if (selection.inMove) {
+      clearPrev();
+      placeSelection();
+    }
 
     const w = Math.abs(x0 - x1);
     const h = Math.abs(y0 - y1);
 
-    Object.assign(selection, { x, y, w, h, inMove: false });
+    Object.assign(selection, { x, y, w, h, data, inMove });
   }
 
   function moveSelection(x0, y0, x1, y1) {
@@ -441,13 +454,56 @@
   function placeSelection(prev=false) {
     let i = 0;
 
+    if (selection.w == -1 || selection.h == -1) return;
+
     getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
       if (!transperent.includes(selection.data[i])) setPixel(x, y, selection.data[i], prev);
       i++;
     });
+    if (!prev) historyUpdate();
+  }
+
+  function pasteSelection() {
+    if (selection.inMove) {
+      clearPrev();
+      placeSelection();
+    }
+
+    setSelection(
+      pos.x, pos.y, 
+      pos.x+saveSelection.w, pos.y+saveSelection.h, 
+      saveSelection.data, false, true
+    );
+    placeSelection(true);
+  }
+
+  function copySelection() {
+    if (selection.x == -1 || selection.y == -1) return;
+    saveSelection.data = [];
+    saveSelection.x = selection.x;
+    saveSelection.y = selection.y;
+    saveSelection.w = selection.w;
+    saveSelection.h = selection.h;
+
+    if (selection.inMove) {
+      clearPrev();
+      placeSelection();
+    }
+
+    getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
+      saveSelection.data.push( 
+        layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
+        "#0000" 
+      );
+    });
   }
 
   function deselect() {
+    if (selection.inMove) {
+      clearPrev();
+      placeSelection();
+    }
+
     Object.assign(selection, { x: 0, y: 0, w: -1, h: -1, data: [] });
   }
 
@@ -814,6 +870,15 @@
           clearPrev();
           placeSelection();
           deselect();
+        }
+        break;
+      case "Copy":
+        copySelection();
+        break;
+      case "Paste":
+        if (saveSelection.data.length != 0) {
+          selectedTool.value = 3;
+          pasteSelection();
         }
         break;
       case "Zoom Out":
