@@ -45,7 +45,7 @@
   const exportCtx = canvasForExport.getContext("2d");
 
   let prevPix;
-  const filledPrevPix = new Set();
+  let pendingPrevPix;
 
   const canvasPos = reactive({
     x: 400,
@@ -113,10 +113,8 @@
       const index = y * canvasWidth.value + x;
 
       if (prev) {
-        filledPrevPix.add(index);
-        prevPix[index] = true;
+        pendingPrevPix[index] = 1;
 
-        previewRender(x, y);
       } else if (layers.value[currentLayer.value].pixels[index] != color) {
         layers.value[currentLayer.value].pixels[index] = color;
 
@@ -127,17 +125,10 @@
     }
   }
 
-  function clearPrev() {
-    for (const value of filledPrevPix) {
-      prevPix[value] = null;
-      previewRender(value % canvasWidth.value, Math.floor(value / canvasWidth.value));
-    }
-    filledPrevPix.clear();
-  }
-
   function prepareСanvas() {
     resetLayers();
-    prevPix = Array(canvasWidth.value * canvasHeight.value).fill(null);
+    prevPix = new Uint8Array(canvasWidth.value * canvasHeight.value);
+    pendingPrevPix = new Uint8Array(canvasWidth.value * canvasHeight.value);
     render();
   }
 
@@ -388,13 +379,29 @@
     }
   }
 
-  function previewRender(x, y) {
-    if (prevPix[y * canvasWidth.value + x] === null) {
-      previewCtx.clearRect(x, y, 1, 1);
-    } else {
-      previewCtx.fillStyle = action == "moveSelection" ? "#00F8" : color.hex;
-      previewCtx.fillRect(x, y, 1, 1);
+  function previewRender(selectTool=false) {
+    for (let i = 0; i < pendingPrevPix.length; i++) {
+      if (pendingPrevPix[i] != prevPix[i]) {
+        const x = i % canvasWidth.value;
+        const y = Math.floor(i / canvasWidth.value);
+
+        if (pendingPrevPix[i] == 1) {
+          previewCtx.fillStyle = selectTool ? "#00F8" : color.hex;
+          previewCtx.fillRect(x, y, 1, 1);
+        } else {
+          previewCtx.clearRect(x, y, 1, 1);
+        }
+      }
     }
+
+    prevPix = new Uint8Array(pendingPrevPix);
+    pendingPrevPix.fill(0);
+  }
+
+  function clearPrev() {
+    previewCtx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+    prevPix.fill(0);
+    pendingPrevPix.fill(0);
   }
 
   function finalRender(target, scale) {
@@ -461,6 +468,7 @@
       i++;
     });
     if (!prev) historyUpdate();
+    else previewRender(true);
   }
 
   function pasteSelection() {
@@ -512,7 +520,6 @@
 
     const dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0);
 
-    if (prev) clearPrev();
     if (perfect) {
       const startX = Math.min(x0, x0 + dx * ((x1 - x0) >= 0 ? 1 : -1));
       const startY = Math.min(y0, y0 + dy * ((y1 - y0) >= 0 ? 1 : -1));
@@ -539,6 +546,7 @@
         if (e2 < dx) { err += dx; y0 += sy; }
       }
     }
+    if (prev) previewRender();
   }
 
   function drawEllipse(x0, y0, x1, y1, color, prev=false) {
@@ -552,7 +560,6 @@
     const width = endX - startX + 1;
     const height = endY - startY + 1;
 
-    if (prev) clearPrev();
     if (width == 1 || height == 1) {
       drawLine(startX, startY, endX, endY, color, prev);
       return;
@@ -622,6 +629,7 @@
         setPixel(endX + 1, endY--, color, prev);
       }
     }
+    if (prev) previewRender();
   }
 
   function drawSquare(x0, y0, x1, y1, color, prev=false) {
@@ -633,7 +641,6 @@
     let endX;
     let endY;
 
-    if (prev) clearPrev();
     if (square) {
       const side = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
     
@@ -651,6 +658,7 @@
       if (fill) setPixel(x, y, color, prev);
       else if (x == startX || x == endX || y == startY || y == endY) setPixel(x, y, color, prev);
     });
+    if (prev) previewRender();
   }
 
   async function saveJson() {
