@@ -449,13 +449,18 @@
   function cutSelection() {
     selection.data = [];
 
-    getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
-      selection.data.push( 
-        layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
-        "#0000" 
-      );
-      setPixel(x, y, "#0000");
-    });
+    if (selection.inMove) {
+      clearPrev();
+      deselect();
+    } else {
+      getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
+        selection.data.push( 
+          layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
+          "#0000" 
+        );
+        setPixel(x, y, "#0000");
+      });
+    }
   }
 
   function placeSelection(prev=false) {
@@ -487,29 +492,27 @@
 
   function copySelection() {
     if (selection.x == -1 || selection.y == -1) return;
-    saveSelection.data = [];
     saveSelection.x = selection.x;
     saveSelection.y = selection.y;
     saveSelection.w = selection.w;
     saveSelection.h = selection.h;
 
     if (selection.inMove) {
-      clearPrev();
-      placeSelection();
+      saveSelection.data = selection.data;
+    } else {
+      saveSelection.data = [];
+      getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
+        saveSelection.data.push( 
+          layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
+          "#0000" 
+        );
+      });
     }
-
-    getPixels(selection.x, selection.y, selection.x+selection.w, selection.y+selection.h, (x, y) => {
-      saveSelection.data.push( 
-        layers.value[currentLayer.value].pixels[y * canvasWidth.value + x] || 
-        "#0000" 
-      );
-    });
   }
 
   function deselect() {
     if (selection.inMove) {
       clearPrev();
-      placeSelection();
     }
 
     Object.assign(selection, { x: 0, y: 0, w: -1, h: -1, data: [] });
@@ -879,6 +882,10 @@
           placeSelection();
           deselect();
         }
+        break;
+      case "Cut":
+        copySelection();
+        cutSelection();
         break;
       case "Copy":
         copySelection();

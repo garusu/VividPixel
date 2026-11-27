@@ -56,6 +56,7 @@ export const menuItems = [
   ["Select", 
     ["Deselect", "Ctrl + D"],
     ["Apply Transform", "Enter"],
+    ["Cut", "Ctrl + X"],
     ["Copy", "Ctrl + C"],
     ["Paste", "Ctrl + V"]
   ],
