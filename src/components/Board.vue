@@ -32,7 +32,8 @@
     currentLayer,
     resetLayers, 
     addLayer, 
-    getLayers
+    getLayers,
+    removeLayer
   } from './layer.js';
 
   const canvas = ref(null);
@@ -867,7 +868,13 @@
           currentLayer.value
         );
         render();
-        break
+        break;
+      case "Add":
+        addLayer();
+        break;
+      case "Delete":
+        removeLayer(currentLayer.value);
+        break;
       case "Clear":
         layers.value[currentLayer.value].softReset();
         render();

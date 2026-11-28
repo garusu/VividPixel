@@ -46,13 +46,15 @@ export const menuItems = [
     ["Resize", "", true],
     ["Reset", ""]
   ],
-  ["Layer", 
-    ["Duplicate", "Ctrl + J"],
-    ["Clear", "Shift + Ctrl + X"]
-  ],
   ["Edit", 
     ["Undo", "Ctrl + Z"],
     ["Redo", "Shift + Ctrl + Z"]
+  ],
+  ["Layer", 
+    ["Add", "Alt + N"],
+    ["Delete", "Delete"],
+    ["Duplicate", "Ctrl + J"],
+    ["Clear", "Shift + Ctrl + X"]
   ],
   ["Select", 
     ["Apply Transform", "Enter"],
@@ -62,8 +64,8 @@ export const menuItems = [
     ["Paste", "Ctrl + V"]
   ],
   ["View", 
-    ["Zoom Out", "Ctrl + Subtract"], 
-    ["Zoom In", "Ctrl + Add"]
+    ["Zoom In", "Ctrl + Add"], 
+    ["Zoom Out", "Ctrl + Subtract"]
   ]
 ];
 
