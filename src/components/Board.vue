@@ -713,7 +713,7 @@
       await nextTick();
 
       for (const [key, value] of Object.entries(data.content)) {
-        addLayer(key, value, false);
+        addLayer(key, value, -1);
       }
       render();
     } else {
@@ -860,6 +860,14 @@
         resetLayers();
         render();
         break;
+      case "Duplicate":
+        addLayer(
+          layers.value[currentLayer.value].title + " copy",
+          layers.value[currentLayer.value].pixels,
+          currentLayer.value
+        );
+        render();
+        break
       case "Clear":
         layers.value[currentLayer.value].softReset();
         render();

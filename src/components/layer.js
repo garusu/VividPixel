@@ -8,7 +8,7 @@ class Layer {
     this.id = Layer.counter;
     this.title = title;
     this.visible = true;
-    this.pixels = pix ? pix : Array(canvasWidth.value * canvasHeight.value).fill("#0000");
+    this.pixels = pix ? [...pix] : Array(canvasWidth.value * canvasHeight.value).fill("#0000");
     this.pixelsBackup =  [...this.pixels];
     this.history = [];
     this.undoHistory = [];
@@ -63,12 +63,12 @@ export const layers = ref([
 
 export let currentLayer = ref(0);
 
-export function addLayer(title=`Layer ${counter}`, pixels=false, first=true) {
-  if (first) {
-    layers.value.unshift(new Layer(title, pixels));
-    currentLayer.value = 0;
-  } else {
+export function addLayer(title=`Layer ${counter}`, pixels=false, index=0) {
+  if (index == -1) {
     layers.value.push(new Layer(title, pixels));
+  } else {
+    layers.value.splice(index, 0, new Layer(title, pixels));
+    currentLayer.value = index;
   }
   counter += 1;
 }

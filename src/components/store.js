@@ -47,6 +47,7 @@ export const menuItems = [
     ["Reset", ""]
   ],
   ["Layer", 
+    ["Duplicate", "Ctrl + J"],
     ["Clear", "Shift + Ctrl + X"]
   ],
   ["Edit", 
@@ -54,8 +55,8 @@ export const menuItems = [
     ["Redo", "Shift + Ctrl + Z"]
   ],
   ["Select", 
-    ["Deselect", "Ctrl + D"],
     ["Apply Transform", "Enter"],
+    ["Deselect", "Ctrl + D"],
     ["Cut", "Ctrl + X"],
     ["Copy", "Ctrl + C"],
     ["Paste", "Ctrl + V"]
